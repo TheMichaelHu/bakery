@@ -1,27 +1,38 @@
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.text.DecimalFormat;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
 public class Database {
     private HashMap<Integer, Order> orders;
-    private HashMap<Integer, Item> inventory;
-    private String orderFile;
-    private String inventoryFile;
+    private HashMap<String, Customer> customers;
+    private HashMap<String, Item> inventory;
+    private File orderFile;
+    private File inventoryFile;
 
-    Database(String newOrdFile, String newInvFile) {
+    Database() {
         this.orders = new HashMap<Integer, Order>();
-        this.inventory = new HashMap<Integer, Item>();
-        this.orderFile = newOrdFile;
-        this.inventoryFile = newInvFile;
+        this.customers = new HashMap<String, Customer>();
+        this.inventory = new HashMap<String, Item>();
+        this.orderFile = new File("ord");
+        this.inventoryFile = new File("inv");
+    }
+    
+    Database(String ordFileName, String invFileName) {
+        this();
+        this.orderFile = new File(ordFileName);
+        this.inventoryFile = new File(invFileName);
     }
 
     Database(String ordFile, String invFile, String newOrdFile,
             String newInvFile) {
-        this.orderFile = newOrdFile;
-        this.inventoryFile = newInvFile;
+        this(newOrdFile, newInvFile);
+        this.populateOrders(this.parseFile(ordFile));
+        this.populateInventory(this.parseFile(invFile));
     }
 
     private ArrayList<String[]> parseFile(String file) {
@@ -31,6 +42,7 @@ public class Database {
             while (scan.hasNextLine()) {
                 list.add(scan.nextLine().split("\t"));
             }
+            scan.close();
         }
         catch (FileNotFoundException e) {
             System.err.println(file + "does not exist");
@@ -39,6 +51,21 @@ public class Database {
     }
 
     private void populateOrders(ArrayList<String[]> list) {
+        BufferedWriter writer;
+        try {
+            writer = new BufferedWriter(new FileWriter(this.orderFile));
+            for (String[] arr : list) {
+                for (String str : arr) {
+                    writer.write(str + "\t");
+                }
+                writer.write("\n");
+            }
+            writer.close();
+        }
+        catch (IOException e1) {
+            System.err.println("Couldn't write to order file.");
+        }
+
         try {
             if (!list.isEmpty() && list.get(0).length == 20
                     && list.get(0)[0].equals("CustomerID")
@@ -64,9 +91,16 @@ public class Database {
             {
                 list.remove(0);
                 for (String[] arr : list) {
-                    Customer c = new Customer(Integer.parseInt(arr[0]), arr[1],
-                            arr[2], arr[3], arr[4], arr[5],
-                            Integer.parseInt(arr[19]));
+                    Customer c;
+                    if(!this.customers.containsKey(arr[0])) {
+                        c = new Customer(Integer.parseInt(arr[0]), arr[1],
+                                arr[2], arr[3], arr[4], arr[5],
+                                Integer.parseInt(arr[19]), Integer.parseInt(arr[18]));
+                        this.addCustomer(c);
+                    }
+                    else {
+                        c = this.customers.get(arr[0]).update(list);
+                    }
                     Item i = this.inventory.get(Integer.parseInt(arr[10]));
                     if (!(arr[11].equals(i.name) && arr[12].equals(i.category) && Integer
                             .parseInt(arr[14]) == i.price))
@@ -89,6 +123,21 @@ public class Database {
     }
 
     private void populateInventory(ArrayList<String[]> list) {
+        BufferedWriter writer;
+        try {
+            writer = new BufferedWriter(new FileWriter(this.inventoryFile));
+            for (String[] arr : list) {
+                for (String str : arr) {
+                    writer.write(str + "\t");
+                }
+                writer.write("\n");
+            }
+            writer.close();
+        }
+        catch (IOException e1) {
+            System.err.println("Couldn't write to inventory file.");
+        }
+
         try {
             if (!list.isEmpty() && list.get(0).length == 4
                     && list.get(0)[0].equals("BakeryItemID")
@@ -100,7 +149,7 @@ public class Database {
                 for (String[] arr : list) {
                     Item i = new Item(Integer.parseInt(arr[0]), arr[1], arr[2],
                             Double.parseDouble(arr[3]));
-                    this.inventory.put(i.id, i);
+                    this.inventory.put(i.name, i);
                 }
             }
             else {
@@ -116,24 +165,27 @@ public class Database {
         this.orders.put(o.id, o);
     }
 
+    void addCustomer(Customer c) {
+        this.customers.put(c.name, c);
+    }
+    
+    void removeCustomer(String name) {
+        this.customers.remove(name);
+    }
+
     void addItem(Item i) {
-        this.inventory.put(i.id, i);
+        this.inventory.put(i.name, i);
     }
 
     void removeItem(String name) {
         this.inventory.remove(name);
     }
+    
+    boolean lookupCustomer(String name) {
+        return this.customers.containsKey(name);
+    }
 
     int totalPurchases() {
         return this.orders.size();
-    }
-
-    public String toString() {
-        String str = "Name/tPrice";
-        for (Item i : this.inventory.values()) {
-            DecimalFormat df = new DecimalFormat("#.00");
-            str += "\n" + i.name + "/t$" + df.format(i.price);
-        }
-        return str;
     }
 }

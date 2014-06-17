@@ -136,7 +136,7 @@ public class BakeryUI {
         else if (cmd.equals("uc")) {
             System.out.println("Enter name of customer to update:");
             String oldName = input.next();
-            if (data.customers.containsKey(oldName)) {
+            if (data.lookupCustomer(oldName)) {
                 data.removeCustomer(oldName);
                 addCustomer(input, data);
             }
@@ -242,7 +242,7 @@ public class BakeryUI {
             return;
         }
         
-        data.addCustomer(id, name, address, city, state, false, 0, 0);
+        data.addCustomer(new Customer(id, name, address, city, state, zipcode, 0, 0));
         System.out.println(name + " added successfully.");
     }
     

@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 /**
  * Class that represents a customer
  * 
@@ -14,8 +16,10 @@ public class Customer {
     String city;
     String state;
     String zipcode;
-    /** True if the customer has a loyalty card */
-    int points;
+    /** loyalty points, 100 will get the customer 10 discount points */
+    int loyalPoints;
+    /** gives the customer a discount on their next purchase */
+    int discountPoints;
 
     /**
      * Constructs a new customer
@@ -38,16 +42,26 @@ public class Customer {
      * @param z
      *            the customer's zipcode
      * 
-     * @param p
+     * @param lp
      *            true customer's loyalty points
+     * 
+     * @param dp
+     *            true customer's discount points
      */
-    Customer(int i, String n, String a, String c, String s, String z, int p) {
+    Customer(int i, String n, String a, String c, String s, String z, int lp,
+            int dp) {
         this.id = i;
         this.name = n;
         this.address = a;
         this.city = c;
         this.state = s;
         this.zipcode = z;
-        this.points = p;
+        this.loyalPoints = lp;
+        this.discountPoints = dp;
+    }
+
+    Customer update(ArrayList<String[]> list) {
+        // TODO update customer with order information
+        return this;
     }
 }
