@@ -8,11 +8,20 @@ import java.util.Calendar;
  * @version 6/15/2014
  */
 public class Order {
-    /** the items in the order */
-    ArrayList<Item> items;
+    /** the customer placing the order */
+    Customer customer;
+    /** the id of the order */
+    int id;
+    boolean paid;
     /** the date the order was placed */
-    String date;
-
+    String orderDate;
+    String pickupDate;
+    /** the items in the order */
+    Item item;
+    int quantity;
+    int discountUsed;
+    
+    
     /**
      * Constructs a new order
      * Requires that list is not null
@@ -20,10 +29,15 @@ public class Order {
      * @param list
      *            a list of items
      */
-    Order(ArrayList<Item> list) {
-        this.items = list;
-        this.date = Calendar.MONTH + "/" + Calendar.DAY_OF_MONTH + "/"
+    Order(Customer c, int i, boolean p, Item it, int q, int d) {
+        this.customer = c;
+        this.id = i;
+        this.paid = p;
+        this.orderDate = Calendar.MONTH + "/" + Calendar.DAY_OF_MONTH + "/"
                 + Calendar.YEAR;
+        this.item = it;
+        this.quantity = q;
+        this.discountUsed = d;
     }
 
     /**
@@ -32,7 +46,7 @@ public class Order {
      * @return the number of items in the order
      */
     int numItems() {
-        return this.items.size();
+        return this.quantity;
     }
 
     /**
@@ -41,10 +55,6 @@ public class Order {
      * @return the total cost of the order
      */
     double totalCost() {
-        int total = 0;
-        for (Item i : this.items) {
-            total += i.price;
-        }
-        return total;
+        return this.item.price*this.quantity - this.discountUsed;
     }
 }

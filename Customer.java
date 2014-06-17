@@ -1,5 +1,3 @@
-import java.util.HashMap;
-
 /**
  * Class that represents a customer
  * 
@@ -7,24 +5,24 @@ import java.util.HashMap;
  * @version 6/15/2014
  */
 public class Customer {
-    /** The name of the customer */ 
+    /** The id of the customer */
+    int id;
+    /** The name of the customer */
     String name;
-    /** The customer's address */ 
+    /** The customer's address */
     String address;
-    /** The customer's phone number */ 
-    String phone;
-    /** The customers credit card number */ 
-    int creditCard;
-    /** A list of the customer's past orders */ 
-    HashMap<String, Order> orders;
-    /** The customer's loyalty points */ 
+    String city;
+    String state;
+    String zipcode;
+    /** True if the customer has a loyalty card */
     int points;
-    /** True if the customer has a loyalty card */ 
-    boolean isLoyal;
-    
+
     /**
      * Constructs a new customer
      * Requires that none of the inputs are null
+     * 
+     * @param i
+     *            the id of the customer
      * 
      * @param n
      *            the name of the customer
@@ -32,20 +30,24 @@ public class Customer {
      * @param a
      *            the customer's address
      * 
-     * @param p
-     *            the customer's phone number
      * @param c
-     *            the customer's credit card number
-     * @param l
-     *            true if the customer has a loyalty card
+     *            the customer's city
+     * @param s
+     *            the customer's state
+     * 
+     * @param z
+     *            the customer's zipcode
+     * 
+     * @param p
+     *            true customer's loyalty points
      */
-    Customer(String n, String a, String p, int c, boolean l) {
+    Customer(int i, String n, String a, String c, String s, String z, int p) {
+        this.id = i;
         this.name = n;
         this.address = a;
-        this.phone = p;
-        this.creditCard = c;
-        this.orders = new HashMap<String, Order>();
-        this.points = 0;
-        this.isLoyal = l;
+        this.city = c;
+        this.state = s;
+        this.zipcode = z;
+        this.points = p;
     }
 }
