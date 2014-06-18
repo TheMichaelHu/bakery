@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 /**
  * Class that represents a customer
  * 
@@ -17,9 +15,9 @@ public class Customer {
     String state;
     String zipcode;
     /** loyalty points, 100 will get the customer 10 discount points */
-    int loyalPoints;
+    double loyalPoints;
     /** gives the customer a discount on their next purchase */
-    int discountPoints;
+    double discountPoints;
 
     /**
      * Constructs a new customer
@@ -48,8 +46,8 @@ public class Customer {
      * @param dp
      *            true customer's discount points
      */
-    Customer(int i, String n, String a, String c, String s, String z, int lp,
-            int dp) {
+    Customer(int i, String n, String a, String c, String s, String z, double lp,
+            double dp) {
         this.id = i;
         this.name = n;
         this.address = a;
@@ -60,8 +58,33 @@ public class Customer {
         this.discountPoints = dp;
     }
 
-    Customer update(ArrayList<String[]> list) {
-        // TODO update customer with order information
+    /**
+     * Updates a customer after their latest order
+     * Requires that the given array follows the structure of an order
+     * 
+     * @param arr
+     *            String array representation of an order
+     * 
+     * @return an updated character
+     */
+    Customer update(String[] arr) {
+        this.loyalPoints += Integer.parseInt(arr[13])
+                * Double.parseDouble(arr[14]);
+        if (this.loyalPoints >= 100) {
+            discountPoints += (int) loyalPoints / 100;
+            loyalPoints %= 100;
+        }
         return this;
+    }
+
+    /**
+     * Updates the customer after using a discount
+     * 
+     * @param discount
+     *            The amount of money discounted (a negative number)
+     */
+    void useDiscount(double discount) {
+        this.discountPoints += discount;
+        this.loyalPoints += discount;
     }
 }

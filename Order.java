@@ -1,4 +1,5 @@
 import java.util.Calendar;
+import java.util.HashMap;
 
 /**
  * Class that represents an order at the bakery
@@ -16,11 +17,9 @@ public class Order {
     String orderDate;
     String pickupDate;
     /** the items in the order */
-    Item item;
-    int quantity;
-    int discountUsed;
-    
-    
+    HashMap<Item, Integer> items;
+    double discountUsed;
+
     /**
      * Constructs a new order
      * Requires that list is not null
@@ -28,15 +27,19 @@ public class Order {
      * @param list
      *            a list of items
      */
-    Order(Customer c, int i, boolean p, Item it, int q, int d) {
+    Order(Customer c, int i, boolean p, String od, String pd, HashMap<Item, Integer> list, double d) {
         this.customer = c;
         this.id = i;
         this.paid = p;
-        this.orderDate = Calendar.MONTH + "/" + Calendar.DAY_OF_MONTH + "/"
-                + Calendar.YEAR;
-        this.item = it;
-        this.quantity = q;
+        this.orderDate = od;
+        this.pickupDate = pd;
+        this.items = list;
         this.discountUsed = d;
+        c.useDiscount(d);
+    }
+    
+    void addItem(Item i, int num) {
+        this.items.put(i, num);
     }
 
     /**
@@ -45,7 +48,24 @@ public class Order {
      * @return the number of items in the order
      */
     int numItems() {
-        return this.quantity;
+        int total = 0;
+        for(Integer i : this.items.values()) {
+            total += i;
+        }
+        return total;
+    }
+
+    /**
+     * returns the total price of the order
+     * 
+     * @return the total price of the order
+     */
+    double totalPrice() {
+        int total = 0;
+        for(Item i : this.items.keySet()) {
+            total += i.price * this.items.get(i);
+        }
+        return total;
     }
 
     /**
@@ -53,7 +73,7 @@ public class Order {
      * 
      * @return the total cost of the order
      */
-    double totalCost() {
-        return this.item.price*this.quantity - this.discountUsed;
+    double finalPrice() {
+        return this.totalPrice() + this.discountUsed;
     }
 }
