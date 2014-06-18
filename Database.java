@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -92,7 +93,7 @@ public class Database {
                 if (!this.customers.containsKey(arr[1])) {
                     c = new Customer(Integer.parseInt(arr[0]), arr[1], arr[2],
                             arr[3], arr[4], arr[5]);
-                    this.addCustomer(c);
+                    this.customers.put(c.name, c);
                 }
                 else {
                     c = this.customers.get(arr[1]);
@@ -154,12 +155,44 @@ public class Database {
         return this.orders.get(id).items;
     }
 
-    void addOrder(Order o) {
-        o.customer.update(o);
-        if (!this.hasCustomer(o.customer.id)) {
-            this.addCustomer(o.customer);
+    void addOrder(String cust, HashMap<Integer, Integer> list) { // Item id,
+                                                                 // quantity
+        if (this.customers.get(cust) == null) {
+            System.err.println("Please add the new customer to "
+                    + "the database first");
+            return;
         }
+
+        // Calculate next id
+        int id = 0;
+        for (Order o : this.orders.values()) {
+            if (o.id > id) {
+                id = o.id + 1;
+            }
+        }
+        // Get date
+        String today = Calendar.MONTH + "/" + Calendar.DATE + "/"
+                + Calendar.YEAR;
+
+        // Generate item hashmap
+        HashMap<Item, Integer> map = new HashMap<Item, Integer>();
+        for (Integer i : list.keySet()) {
+            Item it = this.inventory.get(i);
+            int quantity = list.get(i);
+            map.put(it, quantity);
+        }
+
+        Order o = new Order(this.customers.get(cust), id, today, map);
         this.orders.put(o.id, o);
+    }
+
+    void pickupOrder(int id, int discount) {
+        Order o = this.orders.get(id);
+        o.paid = true;
+        o.pickupDate = Calendar.MONTH + "/" + Calendar.DATE + "/"
+                + Calendar.YEAR;
+        o.discountUsed = discount;
+        o.customer.update(o);
     }
 
     void removeOrder(int id) {
@@ -172,12 +205,21 @@ public class Database {
         return this.orders.containsKey(id);
     }
 
-    void addCustomer(Customer c) {
+    void addCustomer(String name, String adr, String city, String state,
+            String zip) {
+        Customer c = new Customer(this.customers.size(), name, adr, city,
+                state, zip);
         this.customers.put(c.name, c);
     }
 
-    void removeCustomer(String name) {
-        this.customers.remove(name);
+    void updateCustomer(String oldName, String newName, String adr,
+            String city, String state, String zip) {
+        Customer c = this.customers.get(oldName);
+        c.name = newName;
+        c.address = adr;
+        c.city = city;
+        c.state = state;
+        c.zipcode = zip;
     }
 
     boolean hasCustomer(String name) {
@@ -197,12 +239,20 @@ public class Database {
         return this.customers.get(name);
     }
 
-    void addItem(Item i) {
+    void addItem(String name, String category, double price) {
+        // Calculate next id
+        int id = 0;
+        for (Item i : this.inventory.values()) {
+            if (i.id > id) {
+                id = i.id + 1;
+            }
+        }
+        Item i = new Item(id, name, category, price);
         this.inventory.put(i.id, i);
     }
 
     void removeItem(int id) {
-        this.inventory.remove(id);
+        this.inventory.get(id).category = "Discontinued";
     }
 
     boolean hasItem(int id) {
@@ -282,6 +332,9 @@ public class Database {
     void printInventory() {
         String data = "BakeryItemID\tBakeryItemName\tCategory\tPrice";
         for (Item i : this.inventory.values()) {
+            if (i.category.equals("Discontinued")) {
+                continue;
+            }
             data += "\n" + i.id + "\t" + i.name + "\t" + i.category + "\t"
                     + i.price;
         }
