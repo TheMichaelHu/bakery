@@ -18,13 +18,6 @@ public class BakeryUI {
      * @param args Console arguments
      */
     public static void main(String[] args) {
-        /* TODO: Add functionality for:
-         * Add order (and print receipt)
-         * Update bakery item
-         * 
-         * TODO: Add employee viewing functions
-         */
-        
         input = new Scanner(System.in);
         
         startUp();
@@ -43,6 +36,7 @@ public class BakeryUI {
         System.out.println("e - Initialize empty database");
         System.out.println("f - Initialize database from files");
         String cmd = input.next();
+        input.nextLine(); //Skips over extra input
         // Creates empty database
         if (cmd.equals("e")) {
             data = new Database();
@@ -52,12 +46,12 @@ public class BakeryUI {
         else if (cmd.equals("f")) {
             System.out.println();
             System.out.println("Enter the name of the file for order data:");
-            String orders = input.next();
+            String orders = readString();
             
             System.out.println();
             System.out.println(
                     "Enter the name of the file for inventory data:");
-            String inventory = input.next();
+            String inventory = readString();
             
             try {
                 data = new Database(orders, inventory);
@@ -81,7 +75,6 @@ public class BakeryUI {
         System.out.println("o  - New Order");
         System.out.println("ro - Remove Order");
         System.out.println("uo - Update Order");
-        System.out.println("c  - New Customer");
         System.out.println("uc - Update Customer");
         System.out.println("i  - Add Inventory Item");
         System.out.println("ri - Remove Inventory Item");
@@ -91,17 +84,11 @@ public class BakeryUI {
         System.out.println("q  - Quit the System");
         
         String cmd = input.next();
+        input.nextLine(); //Skips over extra input
         // View Item Menu
         if (cmd.equals("m")) {
             System.out.println();
             viewInventory();
-        }
-        // TODO:    Move this inside new order?
-        //          to ensure every customer has an order?
-        // New Customer
-        else if (cmd.equals("c")) {
-            System.out.println();
-            addCustomer();
         }
         // Update Customer
         else if (cmd.equals("uc")) {
@@ -111,7 +98,7 @@ public class BakeryUI {
         // Add Order
         else if (cmd.equals("o")) {
             System.out.println();
-            addOrder(0);
+            addOrder();
         }
         // Remove order
         else if (cmd.equals("ro")) {
@@ -126,7 +113,7 @@ public class BakeryUI {
         // Add Inventory Item
         else if (cmd.equals("i")) {
             System.out.println();
-            addItem(0);
+            addItem();
         }
         // Remove Inventory Item
         else if (cmd.equals("ri")) {
@@ -160,26 +147,19 @@ public class BakeryUI {
         System.out.println("All Items Available for Order:");
         data.printInventory();
         System.out.println();
-        System.out.println("Press Enter to Continue...");
-        // TODO: Find better way to wait
-        String derp = input.next();
-        return;
+        System.out.println("Enter any Key to Continue...");
+        input.next();
+        input.nextLine(); //Skips over extra input
     }
     
     /** Prompts for each field of a new customer and adds it to data 
-     *  @return The customer that is created
+     *  @return The name of the customer that is created
      */
-    static Customer addCustomer() {
-        int id = 0;
+    static String addCustomer() {
         String name, address, city, state, zipcode;
-        // TODO: Fix this loop (Never ends)
-        // We need to check ID's, not key of map
-        while (data.hasCustomer(id)) {
-            id += 1;
-        }
         System.out.println("Enter new Customer Name (Full name):");
         try {
-            name = input.next();
+            name = readString();
             if (data.hasCustomer(name)) {
                 System.out.println("--- Name Already In Database ---");
                 return addCustomer();
@@ -192,7 +172,7 @@ public class BakeryUI {
         }
         System.out.println("Enter new Customer Address:");
         try {
-            address = input.next();
+            address = readString();
         }
         catch (Exception e) {
             System.out.println("--- Invalid Input ---");
@@ -201,7 +181,7 @@ public class BakeryUI {
         }
         System.out.println("Enter new Customer City:");
         try {
-            city = input.next();
+            city = readString();
         }
         catch (Exception e) {
             System.out.println("--- Invalid Input ---");
@@ -210,7 +190,7 @@ public class BakeryUI {
         }
         System.out.println("Enter new Customer State:");
         try {
-            state = input.next();
+            state = readString();
         }
         catch (Exception e) {
             System.out.println("--- Invalid Input ---");
@@ -220,48 +200,97 @@ public class BakeryUI {
         System.out.println("Enter new Customer Zipcode:");
         try {
             zipcode = input.next();
+            input.nextLine(); //Skips over extra input
         }
         catch (Exception e) {
             System.out.println("--- Invalid Input ---");
             System.out.println();
             return addCustomer();
         }
-        Customer c = 
-                new Customer(id, name, address, city, state, zipcode);
-        data.addCustomer(c);
+
+        data.addCustomer(name, address, city, state, zipcode);
         System.out.println(name + " added successfully.");
-        return c;
+        return name;
     }
     
     /** Prompts for a customer and replaces it with an updated one */
     static void updateCustomer() {
         System.out.println("Enter name of customer to update:");
-        String oldName = input.next();
-        if (data.hasCustomer(oldName)) {
-            data.removeCustomer(oldName);
-            addCustomer();
-        }
-        else {
+        String oldName = readString();
+        if (!data.hasCustomer(oldName)) {
             System.out.println("--- Customer not in database. ---");
-            System.out.println();
+            return;
         }
+        
+        String name, address, city, state, zipcode;
+        System.out.println("Enter new Customer Name (Full name):");
+        try {
+            name = readString();
+        }
+        catch (Exception e) {
+            System.out.println("--- Invalid Input ---");
+            System.out.println();
+            updateCustomer();
+            return;
+        }
+        System.out.println("Enter new Customer Address:");
+        try {
+            address = readString();
+        }
+        catch (Exception e) {
+            System.out.println("--- Invalid Input ---");
+            System.out.println();
+            updateCustomer();
+            return;
+        }
+        System.out.println("Enter new Customer City:");
+        try {
+            city = readString();
+        }
+        catch (Exception e) {
+            System.out.println("--- Invalid Input ---");
+            System.out.println();
+            updateCustomer();
+            return;
+        }
+        System.out.println("Enter new Customer State:");
+        try {
+            state = readString();
+        }
+        catch (Exception e) {
+            System.out.println("--- Invalid Input ---");
+            System.out.println();
+            updateCustomer();
+            return;
+        }
+        System.out.println("Enter new Customer Zipcode:");
+        try {
+            zipcode = input.next();
+            input.nextLine(); //Skips over extra input
+        }
+        catch (Exception e) {
+            System.out.println("--- Invalid Input ---");
+            System.out.println();
+            updateCustomer();
+            return;
+        }
+        
+        data.updateCustomer(oldName, name, address, city, state, zipcode);
+        System.out.println(name + " updated successfully.");
     }
     
-    /**
-     * Adds a new order to the database
-     * @param orderId The number to try first for order id
-     */
-    static void addOrder(int orderId) {
-        while (data.hasOrder(orderId)) {
-            orderId += 1;
-        }
+    /** Adds a new order to the database */
+    static void addOrder() {
         System.out.println("Is this order for an existing customer? (y/n)");
         String cmd = input.next();
-        Customer c;
+        input.nextLine(); // Skips extra input
+        
+        String name;
         if (cmd.equals("y")) {
             System.out.println("Enter Full Customer Name:");
             try {
-                c = data.getCustomer(input.next());
+                name = readString();
+                data.getCustomer(name);
             }
             catch (Exception e) {
                 System.out.println("--- Customer Not Found ---");
@@ -269,7 +298,7 @@ public class BakeryUI {
             }
         }
         else if (cmd.equals("n")) {
-            c = addCustomer();
+            name = addCustomer();
         }
         else {
             System.out.println("--- Invalid Input ---");
@@ -277,9 +306,10 @@ public class BakeryUI {
         }
         
         System.out.println();
-        // TODO: CLarify order representation and add body
-        HashMap<Item, Integer> total = data.getItems(orderId);
-        printReceipt(total);
+        HashMap<Integer, Integer> list = new HashMap<Integer, Integer>();
+        // TODO: ADD BODY
+        // TODO: add printReceipt method to data.addOrder
+        data.addOrder(name, list);
         /* =============== Receipt: ===============
          * ORDER ID     DATE        PICKUP DATE
          * CUSTOMER NAME
@@ -292,20 +322,15 @@ public class BakeryUI {
          * ========================================
          */
     }
-    
-    /** Prints the information about the order */
-    static void printReceipt(HashMap<Item, Integer> list) {
-        // TODO: Add body
-    }
-    
+        
     /** Removes the order with the given id */
     static void removeOrder() {
-        System.out.println("Enter ID number of order to change:");
+        System.out.println("Enter ID number of order to remove:");
         try {
-            int oldId = input.nextInt();
-            if (data.hasOrder(oldId)) {
-                data.removeOrder(oldId);
-                System.out.println("Order " + oldId + 
+            int id = input.nextInt();
+            if (data.hasOrder(id)) {
+                data.removeOrder(id);
+                System.out.println("Order " + id + 
                         " successfully removed.");
             }
             else {
@@ -339,30 +364,19 @@ public class BakeryUI {
         }
     }
     
-    /** Adds the item to the inventory 
-     *  @param id The id to check first
-     *  @return The new item
-     */
-    static Item addItem(int id) {
-        int itemId = 0;
+    /** Adds the item to the inventory */
+    static void addItem() {
         String name, category;
         double price;
-        while (data.hasItem(itemId)) {
-            itemId += 1;
-        }
         System.out.println("Enter new Item Name:");
         try {
-            name = input.next();
-          //TODO Items can have the same name as long as they are in different categories. See Strawberry Cream.
-//            if (data.inventory.containsKey(name)) {
-//                System.out.println("--- Item Name Already In Use ---");
-//                return addItem(id);
-//            }
+            name = readString();
         }
         catch (Exception e) {
             System.out.println("--- Invalid Input ---");
             System.out.println();
-            return addItem(id);
+            addItem();
+            return;
         }
         System.out.println("Enter new Item Category:");
         try {
@@ -371,7 +385,8 @@ public class BakeryUI {
         catch (Exception e) {
             System.out.println("--- Invalid Input ---");
             System.out.println();
-            return addItem(id);
+            addItem();
+            return;
         }
         System.out.println("Enter new Item Price (double):");
         try {
@@ -380,27 +395,26 @@ public class BakeryUI {
         catch (Exception e) {
             System.out.println("--- Invalid Input ---");
             System.out.println();
-            return addItem(id);
+            addItem();
+            return;
         }
         
-        Item i = new Item(itemId, name, category, price);
-        data.addItem(i);
-        return i;
+        data.addItem(name, category, price);
     }
     
-    
     /** Remove the given item from the inventory */
-    /*static void removeItem() {
-        System.out.println("Enter name of item to remove from inventory:");
+    static void removeItem() {
+        System.out.println("Enter ID of item to remove from inventory:");
         try {
-            String name = input.next();
-            if (data.inventory.containsKey(name)) { //TODO Gonna need a category also, items can have same name.
-                data.removeItem(name);
-                System.out.println("Item " + name + 
+            int id = input.nextInt();
+            input.nextLine(); // Skips over extra input
+            if (data.hasItem(id)) {
+                data.removeItem(id);
+                System.out.println("Item " + id + 
                         " successfully removed.");
             }
             else {
-                System.out.println("--- No Item with that Name ---");
+                System.out.println("--- No Item with that ID ---");
                 return;
             }
         }
@@ -408,10 +422,10 @@ public class BakeryUI {
             System.out.println("--- Invalid Input ---");
             return;
         }
-    }*/
+    }
     
     /** Replaces the given item with a new one */
-    /*static void updateItem() {
+    static void updateItem() {
         System.out.println("Enter name of item to update:");
         try {
             String name = input.next();
@@ -428,7 +442,7 @@ public class BakeryUI {
             System.out.println("--- Invalid Input ---");
             return;
         }
-    }*/
+    }
     
     
     /** Displays menu options for displaying various info */
@@ -440,7 +454,62 @@ public class BakeryUI {
         System.out.println("of - All orders finished on a specific date");
         System.out.println("oi - All orders of a specific item");
         System.out.println("ou - All unpaid orders");
+        System.out.println("x  - Return to Main Menu");
         
-        // TODO: add code
+        String cmd = input.next();
+        input.nextLine(); // Skips over extra input
+        if (cmd.equals("c")) {
+            System.out.println();
+            customerInfo();
+            infoMenu();
+        }
+        else if (cmd.equals("oc")) {
+            System.out.println();
+            customerOrders();
+            infoMenu();
+        }
+        else if (cmd.equals("op")) {
+            System.out.println();
+            placedDateOrders();
+            infoMenu();
+        }
+        else if (cmd.equals("of")) {
+            System.out.println();
+            finishedDateOrders();
+            infoMenu();
+        }
+        else if (cmd.equals("oi")) {
+            System.out.println();
+            itemOrders();
+            infoMenu();
+        }
+        else if (cmd.equals("ou")) {
+            System.out.println();
+            data.printUnpaidOrders();
+            infoMenu();
+        }
+        else if (cmd.equals("x")) {
+            System.out.println();
+        }
+        else {
+            System.out.println("--- Invalid Command ---");
+            System.out.println();
+            infoMenu();
+        }
+    }
+    
+    
+    
+    /** Method used to get an entire string from the console
+     *  regardless of spaces
+     * @return The string from the console
+     */
+    static String readString() {
+        String ret;
+        ret = input.next();
+        while (input.hasNext()) {
+            ret = ret + " " + input.next();
+        }
+        return ret;
     }
 }
