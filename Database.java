@@ -30,14 +30,14 @@ public class Database {
         this.orders = new HashMap<Integer, Order>();
         this.customers = new HashMap<String, Customer>();
         this.inventory = new HashMap<Integer, Item>();
-        this.orderFile = new File("ord");
-        this.inventoryFile = new File("inv");
+        this.orderFile = new File("ord.txt");
+        this.inventoryFile = new File("inv.txt");
     }
 
     Database(String ordFileName, String invFileName) {
         this();
-        this.orderFile = new File(ordFileName);
-        this.inventoryFile = new File(invFileName);
+        this.orderFile = new File(ordFileName + ".txt");
+        this.inventoryFile = new File(invFileName + ".txt");
     }
 
     Database(String ordFile, String invFile, String newOrdFile,

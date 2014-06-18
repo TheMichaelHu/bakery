@@ -1,4 +1,4 @@
-import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -24,7 +24,6 @@ public class BakeryUI {
          * 
          * TODO: Add employee viewing functions
          */
-        data = new Database();
         
         input = new Scanner(System.in);
         
@@ -33,7 +32,7 @@ public class BakeryUI {
             mainMenu();
         }
         
-        // TODO: Save to files
+        data.writeToFiles();
     }
     
     /** Displays when starting the system and initializes the database. */
@@ -44,53 +43,34 @@ public class BakeryUI {
         System.out.println("e - Initialize empty database");
         System.out.println("f - Initialize database from files");
         String cmd = input.next();
+        // Creates empty database
         if (cmd.equals("e")) {
-            // Database is already empty
+            data = new Database();
             System.out.println();
         }
+        // Creates database from files
         else if (cmd.equals("f")) {
             System.out.println();
-            getOrders();
+            System.out.println("Enter the name of the file for order data:");
+            String orders = input.next();
+            
             System.out.println();
-            getInventory();
-            System.out.println();
+            System.out.println(
+                    "Enter the name of the file for inventory data:");
+            String inventory = input.next();
+            
+            try {
+                data = new Database(orders, inventory);
+            }
+            catch (Exception e) {
+                System.out.println("--- Database Failed to Initialize ---");
+                startUp();
+            }
         }
         else {
             System.out.println("--- Invalid Input ---");
             System.out.println();
             startUp();
-        }
-    }
-    
-    /** Reads from orders file and initializes the database */
-    static void getOrders() {
-        System.out.println("Enter the name of the file for order data:");
-        String file = input.next();
-        try {
-            // TODO: Add method
-            //data.readOrders(file);
-            System.out.println("FEATURE COMING SOON");
-        }
-        catch (Exception e) {
-            System.out.println("--- File not found ---");
-            System.out.println();
-            getOrders();
-        }
-    }
-
-    /** Reads from inventory file and initializes the database */
-    static void getInventory() {
-        System.out.println("Enter the name of the file for inventory data:");
-        String file = input.next();
-        try {
-            // TODO: Add method
-            //data.readInventory(file);
-            System.out.println("FEATURE COMING SOON");
-        }
-        catch (Exception e) {
-            System.out.println("--- File not found ---");
-            System.out.println();
-            getInventory();
         }
     }
     
@@ -151,12 +131,14 @@ public class BakeryUI {
         // Remove Inventory Item
         else if (cmd.equals("ri")) {
             System.out.println();
-            removeItem();
+            System.out.println("FEATURE COMING SOON");
+            //removeItem();
         }
         // Update Inventory Item
         else if (cmd.equals("ui")) {
             System.out.println();
-            updateItem();
+            System.out.println("FEATURE COMING SOON");
+            //updateItem();
         }
         // Open Info Menu
         else if (cmd.equals("v")) {
@@ -179,7 +161,9 @@ public class BakeryUI {
         data.printInventory();
         System.out.println();
         System.out.println("Press Enter to Continue...");
-        input.next();
+        // TODO: Find better way to wait
+        String derp = input.next();
+        return;
     }
     
     /** Prompts for each field of a new customer and adds it to data 
@@ -188,6 +172,8 @@ public class BakeryUI {
     static Customer addCustomer() {
         int id = 0;
         String name, address, city, state, zipcode;
+        // TODO: Fix this loop (Never ends)
+        // We need to check ID's, not key of map
         while (data.hasCustomer(id)) {
             id += 1;
         }
@@ -291,7 +277,7 @@ public class BakeryUI {
         }
         
         System.out.println();
-        // TODO: CLarify order representation
+        // TODO: CLarify order representation and add body
         HashMap<Item, Integer> total = data.getItems(orderId);
         printReceipt(total);
         /* =============== Receipt: ===============
@@ -402,8 +388,9 @@ public class BakeryUI {
         return i;
     }
     
+    
     /** Remove the given item from the inventory */
-    static void removeItem() {
+    /*static void removeItem() {
         System.out.println("Enter name of item to remove from inventory:");
         try {
             String name = input.next();
@@ -421,10 +408,10 @@ public class BakeryUI {
             System.out.println("--- Invalid Input ---");
             return;
         }
-    }
+    }*/
     
     /** Replaces the given item with a new one */
-    static void updateItem() {
+    /*static void updateItem() {
         System.out.println("Enter name of item to update:");
         try {
             String name = input.next();
@@ -441,7 +428,8 @@ public class BakeryUI {
             System.out.println("--- Invalid Input ---");
             return;
         }
-    }
+    }*/
+    
     
     /** Displays menu options for displaying various info */
     static void infoMenu() {
