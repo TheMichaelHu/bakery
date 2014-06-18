@@ -1,4 +1,3 @@
-import java.util.Calendar;
 import java.util.HashMap;
 
 /**
@@ -35,7 +34,6 @@ public class Order {
         this.pickupDate = pd;
         this.items = list;
         this.discountUsed = d;
-        c.useDiscount(d);
     }
     
     void addItem(Item i, int num) {

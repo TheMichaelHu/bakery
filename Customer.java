@@ -46,45 +46,46 @@ public class Customer {
      * @param dp
      *            true customer's discount points
      */
-    Customer(int i, String n, String a, String c, String s, String z, double lp,
-            double dp) {
+    Customer(int i, String n, String a, String c, String s, String z) {
         this.id = i;
         this.name = n;
         this.address = a;
         this.city = c;
         this.state = s;
         this.zipcode = z;
-        this.loyalPoints = lp;
-        this.discountPoints = dp;
+        this.loyalPoints = 0;
+        this.discountPoints = 0;
     }
 
     /**
-     * Updates a customer after their latest order
-     * Requires that the given array follows the structure of an order
+     * Updates a customer's points after they order
      * 
-     * @param arr
-     *            String array representation of an order
-     * 
-     * @return an updated character
+     * @param o
+     *            the customer's order
      */
-    Customer update(String[] arr) {
-        this.loyalPoints += Integer.parseInt(arr[13])
-                * Double.parseDouble(arr[14]);
+    void update(Order o) {
+        this.loyalPoints += o.finalPrice();
+        this.discountPoints += o.discountUsed; // discountUsed should be
+                                               // negative
         if (this.loyalPoints >= 100) {
-            discountPoints += (int) loyalPoints / 100;
-            loyalPoints %= 100;
+            this.discountPoints += ((int) this.loyalPoints / 100) * 10;
+            this.loyalPoints %= 100;
         }
-        return this;
     }
-
+    
     /**
-     * Updates the customer after using a discount
+     * Undoes a customer update in case they cancel an order
      * 
-     * @param discount
-     *            The amount of money discounted (a negative number)
+     * @param o
+     *            the customer's canceled order
      */
-    void useDiscount(double discount) {
-        this.discountPoints += discount;
-        this.loyalPoints += discount;
+    void undoUpdate(Order o) {
+        this.loyalPoints += this.discountPoints*10 - o.finalPrice();
+        this.discountPoints = -o.discountUsed;
+        
+        if (this.loyalPoints >= 100) {
+            this.discountPoints += ((int) this.loyalPoints / 100) * 10;
+            this.loyalPoints %= 100;
+        }
     }
 }

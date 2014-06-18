@@ -91,13 +91,11 @@ public class Database {
                 Customer c;
                 if (!this.customers.containsKey(arr[1])) {
                     c = new Customer(Integer.parseInt(arr[0]), arr[1], arr[2],
-                            arr[3], arr[4], arr[5],
-                            Double.parseDouble(arr[19]),
-                            Double.parseDouble(arr[18]));
+                            arr[3], arr[4], arr[5]);
                     this.addCustomer(c);
                 }
                 else {
-                    c = this.customers.get(arr[1]).update(arr);
+                    c = this.customers.get(arr[1]);
                 }
                 Item i = this.inventory.get(Integer.parseInt(arr[10]));
                 if (i == null
@@ -119,11 +117,16 @@ public class Database {
                     o = this.orders.get(Integer.parseInt(arr[6]));
                     o.addItem(i, Integer.parseInt(arr[13]));
                 }
-                this.addOrder(o);
+                this.orders.put(o.id, o);
             }
         }
         else {
             throw new RuntimeException("Incorrect database file format.");
+        }
+
+        // Update customer info for all orders
+        for (Order o : this.orders.values()) {
+            o.customer.update(o);
         }
     }
 
@@ -146,19 +149,25 @@ public class Database {
             throw new RuntimeException();
         }
     }
-    
+
     HashMap<Item, Integer> getItems(int id) {
         return this.orders.get(id).items;
     }
 
     void addOrder(Order o) {
+        o.customer.update(o);
+        if (!this.hasCustomer(o.customer.id)) {
+            this.addCustomer(o.customer);
+        }
         this.orders.put(o.id, o);
     }
-    
+
     void removeOrder(int id) {
+        Order o = this.orders.get(id);
+        o.customer.undoUpdate(o);
         this.orders.remove(id);
     }
-    
+
     boolean hasOrder(int id) {
         return this.orders.containsKey(id);
     }
@@ -171,6 +180,23 @@ public class Database {
         this.customers.remove(name);
     }
 
+    boolean hasCustomer(String name) {
+        return this.customers.containsKey(name);
+    }
+
+    boolean hasCustomer(int id) {
+        for (Customer c : this.customers.values()) {
+            if (c.id == id) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    Customer getCustomer(String name) {
+        return this.customers.get(name);
+    }
+
     void addItem(Item i) {
         this.inventory.put(i.id, i);
     }
@@ -178,26 +204,9 @@ public class Database {
     void removeItem(int id) {
         this.inventory.remove(id);
     }
-    
+
     boolean hasItem(int id) {
         return this.inventory.containsKey(id);
-    }
-
-    boolean hasCustomer(String name) {
-        return this.customers.containsKey(name);
-    }
-    
-    boolean hasCustomer(int id) {
-        for(Customer c : this.customers.values()) {
-            if(c.id == id) {
-                return false;
-            }
-        }
-        return true;
-    }
-    
-    Customer getCustomer(String name) {
-        return this.customers.get(name);
     }
 
     int totalPurchases() {
@@ -234,7 +243,7 @@ public class Database {
                             + "\t" + o.id + "\t" + o.paid + "\t" + o.orderDate
                             + "\t" + o.pickupDate + "\t" + i.id + "\t" + i.name
                             + "\t" + i.category + "\t" + quantity + "\t"
-                            + i.price * quantity + "\t" + o.totalPrice() + "\t"
+                            + i.price + "\t" + o.totalPrice() + "\t"
                             + o.discountUsed + "\t" + o.finalPrice() + "\t"
                             + c.discountPoints + "\t" + c.loyalPoints;
                 }
@@ -261,15 +270,15 @@ public class Database {
                         + c.city + "\t" + c.state + "\t" + c.zipcode + "\t"
                         + o.id + "\t" + o.paid + "\t" + o.orderDate + "\t"
                         + o.pickupDate + "\t" + i.id + "\t" + i.name + "\t"
-                        + i.category + "\t" + quantity + "\t" + i.price
-                        * quantity + "\t" + o.totalPrice() + "\t"
-                        + o.discountUsed + "\t" + o.finalPrice() + "\t"
-                        + c.discountPoints + "\t" + c.loyalPoints;
+                        + i.category + "\t" + quantity + "\t" + i.price + "\t"
+                        + o.totalPrice() + "\t" + o.discountUsed + "\t"
+                        + o.finalPrice() + "\t" + c.discountPoints + "\t"
+                        + c.loyalPoints;
             }
         }
         System.out.println(data);
     }
-    
+
     void printInventory() {
         String data = "BakeryItemID\tBakeryItemName\tCategory\tPrice";
         for (Item i : this.inventory.values()) {

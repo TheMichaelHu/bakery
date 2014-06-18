@@ -227,7 +227,7 @@ public class BakeryUI {
             return addCustomer();
         }
         Customer c = 
-                new Customer(id, name, address, city, state, zipcode, 0, 0);
+                new Customer(id, name, address, city, state, zipcode);
         data.addCustomer(c);
         System.out.println(name + " added successfully.");
         return c;
