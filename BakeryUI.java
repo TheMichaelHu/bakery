@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 /**
@@ -187,13 +188,13 @@ public class BakeryUI {
     static Customer addCustomer() {
         int id = 0;
         String name, address, city, state, zipcode;
-        while (data.hasCustomerId(id)) {
+        while (data.hasCustomer(id)) {
             id += 1;
         }
         System.out.println("Enter new Customer Name (Full name):");
         try {
             name = input.next();
-            if (data.customers.containsKey(name)) {
+            if (data.hasCustomer(name)) {
                 System.out.println("--- Name Already In Database ---");
                 return addCustomer();
             }
@@ -250,7 +251,7 @@ public class BakeryUI {
     static void updateCustomer() {
         System.out.println("Enter name of customer to update:");
         String oldName = input.next();
-        if (data.lookupCustomer(oldName)) {
+        if (data.hasCustomer(oldName)) {
             data.removeCustomer(oldName);
             addCustomer();
         }
@@ -265,7 +266,7 @@ public class BakeryUI {
      * @param orderId The number to try first for order id
      */
     static void addOrder(int orderId) {
-        while (data.orders.containsKey(orderId)) {
+        while (data.hasOrder(orderId)) {
             orderId += 1;
         }
         System.out.println("Is this order for an existing customer? (y/n)");
@@ -274,7 +275,7 @@ public class BakeryUI {
         if (cmd.equals("y")) {
             System.out.println("Enter Full Customer Name:");
             try {
-                c = data.customers.get(input.next());
+                c = data.getCustomer(input.next());
             }
             catch (Exception e) {
                 System.out.println("--- Customer Not Found ---");
@@ -291,7 +292,7 @@ public class BakeryUI {
         
         System.out.println();
         // TODO: CLarify order representation
-        ArrayList<Order> total = getItems(c, orderId);
+        HashMap<Item, Integer> total = data.getItems(orderId);
         printReceipt(total);
         /* =============== Receipt: ===============
          * ORDER ID     DATE        PICKUP DATE
@@ -307,7 +308,7 @@ public class BakeryUI {
     }
     
     /** Prints the information about the order */
-    static void printReceipt(ArrayList<Order> list) {
+    static void printReceipt(HashMap<Item, Integer> list) {
         // TODO: Add body
     }
     
@@ -316,8 +317,8 @@ public class BakeryUI {
         System.out.println("Enter ID number of order to change:");
         try {
             int oldId = input.nextInt();
-            if (data.orders.containsKey(oldId)) {
-                data.orders.remove(oldId);
+            if (data.hasOrder(oldId)) {
+                data.removeOrder(oldId);
                 System.out.println("Order " + oldId + 
                         " successfully removed.");
             }
@@ -337,8 +338,8 @@ public class BakeryUI {
         System.out.println("Enter ID number of order to change:");
         try {
             int oldId = input.nextInt();
-            if (data.orders.containsKey(oldId)) {
-                data.orders.remove(oldId);
+            if (data.hasOrder(oldId)) {
+                data.removeOrder(oldId);
                 addOrder(oldId);
             }
             else {
@@ -360,16 +361,17 @@ public class BakeryUI {
         int itemId = 0;
         String name, category;
         double price;
-        while (data.hasItemId(itemId)) {
+        while (data.hasItem(itemId)) {
             itemId += 1;
         }
         System.out.println("Enter new Item Name:");
         try {
             name = input.next();
-            if (data.inventory.containsKey(name)) {
-                System.out.println("--- Item Name Already In Use ---");
-                return addItem(id);
-            }
+          //TODO Items can have the same name as long as they are in different categories. See Strawberry Cream.
+//            if (data.inventory.containsKey(name)) {
+//                System.out.println("--- Item Name Already In Use ---");
+//                return addItem(id);
+//            }
         }
         catch (Exception e) {
             System.out.println("--- Invalid Input ---");
@@ -405,8 +407,8 @@ public class BakeryUI {
         System.out.println("Enter name of item to remove from inventory:");
         try {
             String name = input.next();
-            if (data.inventory.containsKey(name)) {
-                data.orders.remove(name);
+            if (data.inventory.containsKey(name)) { //TODO Gonna need a category also, items can have same name.
+                data.removeItem(name);
                 System.out.println("Item " + name + 
                         " successfully removed.");
             }

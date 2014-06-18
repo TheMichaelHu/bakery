@@ -146,9 +146,21 @@ public class Database {
             throw new RuntimeException();
         }
     }
+    
+    HashMap<Item, Integer> getItems(int id) {
+        return this.orders.get(id).items;
+    }
 
     void addOrder(Order o) {
         this.orders.put(o.id, o);
+    }
+    
+    void removeOrder(int id) {
+        this.orders.remove(id);
+    }
+    
+    boolean hasOrder(int id) {
+        return this.orders.containsKey(id);
     }
 
     void addCustomer(Customer c) {
@@ -166,9 +178,26 @@ public class Database {
     void removeItem(int id) {
         this.inventory.remove(id);
     }
+    
+    boolean hasItem(int id) {
+        return this.inventory.containsKey(id);
+    }
 
-    boolean lookupCustomer(String name) {
+    boolean hasCustomer(String name) {
         return this.customers.containsKey(name);
+    }
+    
+    boolean hasCustomer(int id) {
+        for(Customer c : this.customers.values()) {
+            if(c.id == id) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    Customer getCustomer(String name) {
+        return this.customers.get(name);
     }
 
     int totalPurchases() {
@@ -178,7 +207,7 @@ public class Database {
     void writeToFiles() {
         try {
             BufferedWriter writer;
-            
+
             // Writing to inventory file
             writer = new BufferedWriter(new FileWriter(this.inventoryFile));
             String data = "BakeryItemID\tBakeryItemName\tCategory\tPrice";
@@ -188,7 +217,7 @@ public class Database {
             }
             writer.write(data);
             writer.close();
-            
+
             // Writing to order file
             writer = new BufferedWriter(new FileWriter(this.orderFile));
             data = "CustomerID\tLastName\tAddress\tCity\tState\t"
@@ -216,6 +245,37 @@ public class Database {
         catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    void printOrders() {
+        String data = "CustomerID\tLastName\tAddress\tCity\tState\t"
+                + "ZipCode\tOrderID\tPaid?\tOrderDate\tPickupDate\t"
+                + "BakeryItemID\tBakeryItemName\tBakeryItemCategory\t"
+                + "Quantity\tPrice\tTotal\tDiscountUsedOnOrder\tTotalDue"
+                + "\tAvailableDiscount\tCurrentLoyalty";
+        for (Order o : this.orders.values()) {
+            Customer c = o.customer;
+            for (Item i : o.items.keySet()) {
+                int quantity = o.items.get(i);
+                data += "\n" + c.id + "\t" + c.name + "\t" + c.address + "\t"
+                        + c.city + "\t" + c.state + "\t" + c.zipcode + "\t"
+                        + o.id + "\t" + o.paid + "\t" + o.orderDate + "\t"
+                        + o.pickupDate + "\t" + i.id + "\t" + i.name + "\t"
+                        + i.category + "\t" + quantity + "\t" + i.price
+                        * quantity + "\t" + o.totalPrice() + "\t"
+                        + o.discountUsed + "\t" + o.finalPrice() + "\t"
+                        + c.discountPoints + "\t" + c.loyalPoints;
+            }
+        }
+        System.out.println(data);
+    }
+    
+    void printInventory() {
+        String data = "BakeryItemID\tBakeryItemName\tCategory\tPrice";
+        for (Item i : this.inventory.values()) {
+            data += "\n" + i.id + "\t" + i.name + "\t" + i.category + "\t"
+                    + i.price;
+        }
+        System.out.println(data);
     }
 }
