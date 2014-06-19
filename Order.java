@@ -110,4 +110,43 @@ public class Order {
     double finalPrice() {
         return this.totalPrice() + this.discountUsed;
     }
+
+    /** =========================== Receipt: ===========================
+     * ORDER ID: 118      ORDER DATE: 12/12/12     PICKUP DATE: 12/12/12
+     * NAME: the Wankershim
+     * -- ITEM: Triple Berry Shortcake   AMOUNT: 12     PRICE: $12.67
+     * -- ITEM                           AMOUNT         PRICE
+     * -----------------------------------------------------------------
+     * DISCOUNT USED: 0
+     * -----------------------------------------------------------------
+     * TOTAL: $12222
+     * PAID? Yes
+     * LOYALTY CREDIT: 13333
+     * DISCOUNT AVAILABLE: 100
+     * =================================================================
+     */
+    void printReceipt() {
+        String str = "";
+        str += "=========================== Receipt: ===========================";
+        str += "\nORDER ID: " + (this.id + "       ").substring(0, 8)
+                + "  DATE: "
+                + (this.orderDate + "           ").substring(0, 12)
+                + "  PICKUP DATE: " + this.pickupDate;
+        str += "\nNAME: " + this.customer.name;
+        for (Item i : this.items.keySet()) {
+            int quantity = this.items.get(i);
+            str += "\n-- ITEM: "
+                    + (i.name + "                       ").substring(0, 23)
+                    + "  AMOUNT: $" + (quantity + "    ").substring(0, 5)
+                    + "  PRICE: $" + i.price * quantity;
+        }
+        str += "\n-----------------------------------------------------------------";
+        str += "\nDISCOUNT USED: " + this.discountUsed;
+        str += "\n-----------------------------------------------------------------";
+        str += "\nTOTAL: $" + this.finalPrice();
+        str += "\nPAID? " + (this.paid ? "Yes" : "No");
+        str += "\nLOYALTY CREDIT: " + this.customer.loyalPoints;
+        str += "\nDISCOUNT AVAILABLE: " + this.customer.discountPoints;
+        System.out.println(str);
+    }
 }
