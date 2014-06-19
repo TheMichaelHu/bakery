@@ -28,6 +28,7 @@ public class BakeryUI {
         }
         
         data.writeToFiles();
+        System.out.println("Bye!");
     }
     
     /** Displays when starting the system and initializes the database. */
@@ -54,6 +55,7 @@ public class BakeryUI {
         else if (cmd.equals("f")) {
             System.out.println();
             System.out.println("Enter the name of the file for order data:");
+            System.out.println("(Leave off the .txt suffix)");
             String orders;
             try {
                 orders = input.readLine();
@@ -66,6 +68,7 @@ public class BakeryUI {
             System.out.println();
             System.out.println(
                     "Enter the name of the file for inventory data:");
+            System.out.println("(Leave off the .txt suffix)");
             String inventory;
             try {
                 inventory = input.readLine();
@@ -75,7 +78,7 @@ public class BakeryUI {
             }
             
             try {
-                data = new Database(orders, inventory);
+                data = new Database(orders, inventory, "ord", "inv");
             }
             catch (Exception e) {
                 System.out.println("--- Database Failed to Initialize ---");
@@ -101,7 +104,6 @@ public class BakeryUI {
         System.out.println("ri - Remove Inventory Item");
         System.out.println("ui - Update Inventory Item");
         System.out.println("v  - View Info");
-        System.out.println("s  - Output Database to File");
         System.out.println("q  - Quit the System");
         
         String cmd;
@@ -143,14 +145,12 @@ public class BakeryUI {
         // Remove Inventory Item
         else if (cmd.equals("ri")) {
             System.out.println();
-            System.out.println("FEATURE COMING SOON");
-            //removeItem();
+            removeItem();
         }
         // Update Inventory Item
         else if (cmd.equals("ui")) {
             System.out.println();
-            System.out.println("FEATURE COMING SOON");
-            //updateItem();
+            updateItem();
         }
         // Open Info Menu
         else if (cmd.equals("v")) {
@@ -342,20 +342,63 @@ public class BakeryUI {
         
         System.out.println();
         HashMap<Integer, Integer> list = new HashMap<Integer, Integer>();
-        // TODO: ADD BODY
-        // TODO: add printReceipt method to data.addOrder
+        
+        addOrderItems(list);
+        
         data.addOrder(name, list);
-        /* =============== Receipt: ===============
-         * ORDER ID     DATE        PICKUP DATE
-         * CUSTOMER NAME
-         * -- ITEM              AMOUNT      PRICE
-         * -- ITEM              AMOUNT      PRICE
-         * ----------------------------------------
-         * TOTAL PRICE
-         * PAID?
-         * REMAINING LOYALTY CREDIT
-         * ========================================
-         */
+    }
+    
+    /**
+     * Builds up the list of items in the order
+     * @param list The list to build on
+     */
+    static void addOrderItems(HashMap<Integer, Integer> list) {
+        int id, count;
+        System.out.println("Enter ID number of item you want to order:");
+        try {
+            id = Integer.parseInt(input.readLine());
+            if (!data.hasItem(id)) {
+                System.out.println("--- No Item with that ID ---");
+                addOrderItems(list);
+                return;
+            }
+        }
+        catch (Exception e) {
+            System.out.println("--- Invalid Input ---");
+            addOrderItems(list);
+            return;
+        }
+        System.out.println("Enter the quantity you want to order:");
+        try {
+            count = Integer.parseInt(input.readLine());
+            if (count < 1) {
+                System.out.println("--- Must Order at Least 1 Item ---");
+                addOrderItems(list);
+                return;
+            }
+        }
+        catch (Exception e) {
+            System.out.println("--- Invalid Input ---");
+            addOrderItems(list);
+            return;
+        }
+        
+        list.put(id, count);
+        System.out.println("Add another Item? (y/n):");
+        try {
+            String cmd = input.readLine();
+            if (cmd.equals("y")) {
+                addOrderItems(list);
+                return;
+            }
+            else {
+                return;
+            }
+        }
+        catch (Exception e) {
+            System.out.println("--- Invalid Input ---");
+            return;
+        }
     }
         
     /** Removes the order with the given id */
@@ -381,14 +424,11 @@ public class BakeryUI {
     
     /** Replaces the order with the given ID with a new one */
     static void updateOrder() {
-        /*System.out.println("Enter ID number of order to change:");
+        System.out.println("Enter ID number of order to change:");
+        int oldId;
         try {
-            int oldId = Integer.parseInt(input.readLine());
-            if (data.hasOrder(oldId)) {
-                data.removeOrder(oldId);
-                addOrder(oldId);
-            }
-            else {
+            oldId = Integer.parseInt(input.readLine());
+            if (!data.hasOrder(oldId)) {
                 System.out.println("--- No Order with that ID ---");
                 return;
             }
@@ -396,7 +436,23 @@ public class BakeryUI {
         catch (Exception e) {
             System.out.println("--- Invalid Input ---");
             return;
-        }*/
+        }
+        
+        System.out.println("Enter Customer Name for this Order:");
+        String name;
+        try {
+            name = input.readLine();
+        }
+        catch (Exception e) {
+            System.out.println("--- Invalid Input ---");
+            return;
+        }
+        
+        System.out.println();
+        HashMap<Integer, Integer> list = new HashMap<Integer, Integer>();
+        addOrderItems(list);
+        
+        data.updateOrder(oldId, name, list);
     }
     
     /** Adds the item to the inventory */
@@ -460,22 +516,43 @@ public class BakeryUI {
     
     /** Replaces the given item with a new one */
     static void updateItem() {
-        /*System.out.println("Enter name of item to update:");
+        System.out.println("Enter ID of item to update:");
+        int id;
         try {
-            String name = input.readLine();
-            if (data.inventory.containsKey(name)) {
-                int newId = data.orders.remove(name).id;
-                addItem(newId);
-            }
-            else {
-                System.out.println("--- No Item with that Name ---");
+            id = Integer.parseInt(input.readLine());
+            if (!data.hasItem(id)) {
+                System.out.println("--- No Item with that ID ---");
                 return;
             }
         }
         catch (Exception e) {
             System.out.println("--- Invalid Input ---");
             return;
-        }*/
+        }
+        
+        String name, category;
+        try {
+            System.out.println("Enter name of item:");
+            name = input.readLine();
+            System.out.println("Enter name of item category:");
+            category = input.readLine();
+        }
+        catch (Exception e) {
+            System.out.println("--- Invalid Input ---");
+            return;
+        }
+        
+        Double price;
+        try {
+            System.out.println("Enter price:");
+            price = Double.parseDouble(input.readLine());
+        }
+        catch (Exception e) {
+            System.out.println("--- Invalid Input ---");
+            return;
+        }
+        
+        data.updateItem(id, name, category, price);
     }
     
     
@@ -500,7 +577,21 @@ public class BakeryUI {
         // Specific customer information
         if (cmd.equals("c")) {
             System.out.println();
-            //TODO: customerInfo();
+            System.out.println("Enter the full name of the customer:");
+            String name;
+            try {
+                name = input.readLine();
+            } catch (IOException e) {
+                infoMenu();
+                return;
+            }
+            if (data.hasCustomer(name)) {
+                data.printCustomer(name);
+            }
+            else {
+                System.out.println("--- Customer name not in database ---");
+                infoMenu();
+            }
             System.out.println("Press Enter to Continue...");
             try {
                 input.readLine();
