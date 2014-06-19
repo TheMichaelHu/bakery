@@ -1,0 +1,9 @@
+Member Contributions:
+
+William Enright:
+ - Developed the UI and making it work with the rest of the data structure.
+ - Worked on error checking in the processes of the user interface.
+
+Michael Hu:
+ - Developed the data structure and accessors below the UI
+ - Worked on writing the test program
