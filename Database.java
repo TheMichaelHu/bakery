@@ -129,6 +129,10 @@ public class Database {
         for (Order o : this.orders.values()) {
             o.customer.update(o);
         }
+
+        if (this.orders.isEmpty()) {
+            System.err.println("Database is empty.");
+        }
     }
 
     private void populateInventory(ArrayList<String[]> list) {
@@ -146,17 +150,15 @@ public class Database {
             }
         }
         else {
-            System.err.println("Incorrect inventory file format.");
-            throw new RuntimeException();
+            throw new RuntimeException("Incorrect inventory file format.");
+        }
+
+        if (this.inventory.isEmpty()) {
+            System.err.println("Inventory is empty.");
         }
     }
 
-    HashMap<Item, Integer> getItems(int id) {
-        return this.orders.get(id).items;
-    }
-
-    void addOrder(String cust, HashMap<Integer, Integer> list) { // Item id,
-                                                                 // quantity
+    void addOrder(String cust, HashMap<Integer, Integer> list) {
         if (this.customers.get(cust) == null) {
             System.err.println("Please add the new customer to "
                     + "the database first");
@@ -184,6 +186,27 @@ public class Database {
 
         Order o = new Order(this.customers.get(cust), id, today, map);
         this.orders.put(o.id, o);
+
+        o.printReceipt();
+    }
+
+    void updateOrder(int id, String cust, HashMap<Integer, Integer> list) {
+        if (this.customers.get(cust) == null) {
+            System.err.println("Please add the new customer to "
+                    + "the database first");
+            return;
+        }
+        // Generate item hashmap
+        HashMap<Item, Integer> map = new HashMap<Item, Integer>();
+        for (Integer i : list.keySet()) {
+            Item it = this.inventory.get(i);
+            int quantity = list.get(i);
+            map.put(it, quantity);
+        }
+
+        Order o = this.orders.get(id);
+        o.customer = this.customers.get(cust);
+        o.items = map;
     }
 
     void pickupOrder(int id, int discount) {
@@ -239,6 +262,10 @@ public class Database {
         return this.customers.get(name);
     }
 
+    void printCustomer(String name) {
+        this.customers.get(name).printCustomer();
+    }
+
     void addItem(String name, String category, double price) {
         // Calculate next id
         int id = 0;
@@ -253,6 +280,17 @@ public class Database {
 
     void removeItem(int id) {
         this.inventory.get(id).category = "Discontinued";
+    }
+
+    HashMap<Item, Integer> getItems(int id) {
+        return this.orders.get(id).items;
+    }
+    
+    void updateItem(int id, String name, String category, double price) {
+        Item i = this.inventory.get(id);
+        i.name = name;
+        i.category = category;
+        i.price = price;
     }
 
     boolean hasItem(int id) {
@@ -329,10 +367,12 @@ public class Database {
         }
         System.out.println(data);
     }
-    
+
     /**
      * Prints all the orders placed by the given customer
-     * @param customer The given customer's name
+     * 
+     * @param customer
+     *            The given customer's name
      */
     void printCustomerOrders(String customer) {
         String data = "CustomerID\tName\t"
@@ -344,22 +384,24 @@ public class Database {
             if (c.name.equals(customer)) {
                 for (Item i : o.items.keySet()) {
                     int quantity = o.items.get(i);
-                    data += "\n" + c.id + "\t" + c.name + "\t"
-                            + o.id + "\t" + o.paid + "\t" + o.orderDate + "\t"
-                            + o.pickupDate + "\t" + i.id + "\t" + i.name + "\t"
-                            + i.category + "\t" + quantity + "\t" 
-                            + i.price + "\t" + o.totalPrice() + "\t" 
-                            + o.discountUsed + "\t" + o.finalPrice();
+                    data += "\n" + c.id + "\t" + c.name + "\t" + o.id + "\t"
+                            + o.paid + "\t" + o.orderDate + "\t" + o.pickupDate
+                            + "\t" + i.id + "\t" + i.name + "\t" + i.category
+                            + "\t" + quantity + "\t" + i.price + "\t"
+                            + o.totalPrice() + "\t" + o.discountUsed + "\t"
+                            + o.finalPrice();
                 }
             }
         }
         System.out.println(data);
         System.out.println();
     }
-    
+
     /**
      * Prints all orders placed on a certain date
-     * @param date The given date
+     * 
+     * @param date
+     *            The given date
      */
     void printPlacedDateOrders(String date) {
         String data = "CustomerID\tName\t"
@@ -371,22 +413,24 @@ public class Database {
             if (o.orderDate.equals(date)) {
                 for (Item i : o.items.keySet()) {
                     int quantity = o.items.get(i);
-                    data += "\n" + c.id + "\t" + c.name + "\t"
-                            + o.id + "\t" + o.paid + "\t" + o.orderDate + "\t"
-                            + o.pickupDate + "\t" + i.id + "\t" + i.name + "\t"
-                            + i.category + "\t" + quantity + "\t" 
-                            + i.price + "\t" + o.totalPrice() + "\t" 
-                            + o.discountUsed + "\t" + o.finalPrice();
+                    data += "\n" + c.id + "\t" + c.name + "\t" + o.id + "\t"
+                            + o.paid + "\t" + o.orderDate + "\t" + o.pickupDate
+                            + "\t" + i.id + "\t" + i.name + "\t" + i.category
+                            + "\t" + quantity + "\t" + i.price + "\t"
+                            + o.totalPrice() + "\t" + o.discountUsed + "\t"
+                            + o.finalPrice();
                 }
             }
         }
         System.out.println(data);
         System.out.println();
     }
-    
+
     /**
      * Prints all orders finished/picked up on a certain date
-     * @param date The given date
+     * 
+     * @param date
+     *            The given date
      */
     void printFinishedDateOrders(String date) {
         String data = "CustomerID\tName\t"
@@ -398,22 +442,24 @@ public class Database {
             if (o.pickupDate.equals(date)) {
                 for (Item i : o.items.keySet()) {
                     int quantity = o.items.get(i);
-                    data += "\n" + c.id + "\t" + c.name + "\t"
-                            + o.id + "\t" + o.paid + "\t" + o.orderDate + "\t"
-                            + o.pickupDate + "\t" + i.id + "\t" + i.name + "\t"
-                            + i.category + "\t" + quantity + "\t" 
-                            + i.price + "\t" + o.totalPrice() + "\t" 
-                            + o.discountUsed + "\t" + o.finalPrice();
+                    data += "\n" + c.id + "\t" + c.name + "\t" + o.id + "\t"
+                            + o.paid + "\t" + o.orderDate + "\t" + o.pickupDate
+                            + "\t" + i.id + "\t" + i.name + "\t" + i.category
+                            + "\t" + quantity + "\t" + i.price + "\t"
+                            + o.totalPrice() + "\t" + o.discountUsed + "\t"
+                            + o.finalPrice();
                 }
             }
         }
         System.out.println(data);
         System.out.println();
     }
-    
+
     /**
      * Prints all orders of the given item id
-     * @param itemId The id of the item
+     * 
+     * @param itemId
+     *            The id of the item
      */
     void printItemOrders(int itemId) {
         String data = "CustomerID\tName\t"
@@ -425,19 +471,19 @@ public class Database {
             for (Item i : o.items.keySet()) {
                 if (i.id == itemId) {
                     int quantity = o.items.get(i);
-                    data += "\n" + c.id + "\t" + c.name + "\t"
-                            + o.id + "\t" + o.paid + "\t" + o.orderDate + "\t"
-                            + o.pickupDate + "\t" + i.id + "\t" + i.name + "\t"
-                            + i.category + "\t" + quantity + "\t" 
-                            + i.price + "\t" + o.totalPrice() + "\t" 
-                            + o.discountUsed + "\t" + o.finalPrice();
+                    data += "\n" + c.id + "\t" + c.name + "\t" + o.id + "\t"
+                            + o.paid + "\t" + o.orderDate + "\t" + o.pickupDate
+                            + "\t" + i.id + "\t" + i.name + "\t" + i.category
+                            + "\t" + quantity + "\t" + i.price + "\t"
+                            + o.totalPrice() + "\t" + o.discountUsed + "\t"
+                            + o.finalPrice();
                 }
             }
         }
         System.out.println(data);
         System.out.println();
     }
-    
+
     void printUnpaidOrders() {
         String data = "CustomerID\tName\t"
                 + "OrderID\tPaid?\tOrderDate\tPickupDate\t"
@@ -448,12 +494,12 @@ public class Database {
             if (!o.paid) {
                 for (Item i : o.items.keySet()) {
                     int quantity = o.items.get(i);
-                    data += "\n" + c.id + "\t" + c.name + "\t"
-                            + o.id + "\t" + o.paid + "\t" + o.orderDate + "\t"
-                            + o.pickupDate + "\t" + i.id + "\t" + i.name + "\t"
-                            + i.category + "\t" + quantity + "\t" 
-                            + i.price + "\t" + o.totalPrice() + "\t" 
-                            + o.discountUsed + "\t" + o.finalPrice();
+                    data += "\n" + c.id + "\t" + c.name + "\t" + o.id + "\t"
+                            + o.paid + "\t" + o.orderDate + "\t" + o.pickupDate
+                            + "\t" + i.id + "\t" + i.name + "\t" + i.category
+                            + "\t" + quantity + "\t" + i.price + "\t"
+                            + o.totalPrice() + "\t" + o.discountUsed + "\t"
+                            + o.finalPrice();
                 }
             }
         }

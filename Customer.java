@@ -72,7 +72,7 @@ public class Customer {
             this.loyalPoints %= 100;
         }
     }
-    
+
     /**
      * Undoes a customer update in case they cancel an order
      * 
@@ -80,12 +80,19 @@ public class Customer {
      *            the customer's canceled order
      */
     void undoUpdate(Order o) {
-        this.loyalPoints += this.discountPoints*10 - o.finalPrice();
+        this.loyalPoints += this.discountPoints * 10 - o.finalPrice();
         this.discountPoints = -o.discountUsed;
-        
+
         if (this.loyalPoints >= 100) {
             this.discountPoints += ((int) this.loyalPoints / 100) * 10;
             this.loyalPoints %= 100;
         }
+    }
+
+    void printCustomer() {
+        System.out.println("NAME: " + this.name + "\nADDRESS: " + this.address
+                + ", " + this.city + ", " + this.state + " " + this.zipcode
+                + "\nLOYALTY POINTS: " + this.loyalPoints
+                + "\nDISCOUNT AVAILABLE: " + this.discountPoints);
     }
 }
