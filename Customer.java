@@ -38,10 +38,6 @@ class Customer {
      *            the customer's state
      * @param z
      *            the customer's zipcode
-     * @param lp
-     *            true customer's loyalty points
-     * @param dp
-     *            true customer's discount points
      */
     Customer(int i, String n, String a, String c, String s, String z) {
         this.id = i;

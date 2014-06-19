@@ -143,7 +143,8 @@ public class Database {
                                 && arr[12].equals(i.category) && Double
                                 .parseDouble(arr[14]) == i.price))
                 {
-                    throw new RuntimeException("Incorrect product information.");
+                    throw new RuntimeException(
+                            "Incorrect product information.");
                 }
                 Order o;
                 if (!this.orders.containsKey(Integer.parseInt(arr[6]))) {
@@ -434,8 +435,6 @@ public class Database {
      *            the item's category
      * @param price
      *            the item's price
-     * @return returns the customer with the given name from the customer
-     *         database
      */
     void addItem(String name, String category, double price) {
         // Calculate next id
@@ -456,7 +455,7 @@ public class Database {
      *            the id of an item
      */
     void removeItem(int id) {
-        this.inventory.get(id).category = "Discontinued";
+            this.inventory.get(id).category = "Discontinued";
     }
 
     /**
@@ -481,7 +480,6 @@ public class Database {
      *            the item's new category
      * @param price
      *            the item's new price
-     * @return the item with the given id from the inventory
      */
     void updateItem(int id, String name, String category, double price) {
         Item i = this.inventory.get(id);

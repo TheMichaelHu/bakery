@@ -11,8 +11,11 @@ import java.io.InputStreamReader;
  */
 public class BakeryUI {
     
+    /** Whether or not to quit the program */
     static boolean quit = false;
+    /** The database for the bakery */
     static Database data;
+    /** The reader for the console input */
     static BufferedReader input;
     
     /**
@@ -72,7 +75,8 @@ public class BakeryUI {
             String inventory;
             try {
                 inventory = input.readLine();
-            } catch (IOException e1) {
+            } 
+            catch (IOException e1) {
                 startUp();
                 return;                
             }
@@ -109,7 +113,8 @@ public class BakeryUI {
         String cmd;
         try {
             cmd = input.readLine();
-        } catch (IOException e) {
+        } 
+        catch (IOException e) {
             return;
         }
         // View Item Menu
@@ -177,6 +182,7 @@ public class BakeryUI {
             input.readLine();
         } 
         catch (IOException e) {
+            //Return to menu
         }
     }
     
@@ -184,7 +190,17 @@ public class BakeryUI {
      *  @return The name of the customer that is created
      */
     static String addCustomer() {
-        String name, address, city, state, zipcode;
+        /** Customers name */
+        String name;
+        /** Customers address */
+        String address;
+        /** Customers city */
+        String city;
+        /** Customers state */
+        String state;
+        /** Customers zipcode */
+        String zipcode;
+        
         System.out.println("Enter new Customer Name (Full name):");
         try {
             name = input.readLine();
@@ -246,7 +262,8 @@ public class BakeryUI {
         String oldName;
         try {
             oldName = input.readLine();
-        } catch (IOException e1) {
+        } 
+        catch (IOException e1) {
             return;
         }
         if (!data.hasCustomer(oldName)) {
@@ -254,7 +271,17 @@ public class BakeryUI {
             return;
         }
         
-        String name, address, city, state, zipcode;
+        /** Customers name */
+        String name;
+        /** Customers address */
+        String address;
+        /** Customers city */
+        String city;
+        /** Customers state */
+        String state;
+        /** Customers zipcode */
+        String zipcode;
+        
         System.out.println("Enter new Customer Name (Full name):");
         try {
             name = input.readLine();
@@ -316,7 +343,8 @@ public class BakeryUI {
         String cmd;
         try {
             cmd = input.readLine();
-        } catch (IOException e1) {
+        } 
+        catch (IOException e1) {
             return;
         }
         
@@ -353,7 +381,11 @@ public class BakeryUI {
      * @param list The list to build on
      */
     static void addOrderItems(HashMap<Integer, Integer> list) {
-        int id, count;
+        /** The ID of the item */
+        int id;
+        /** The quantity of the item */
+        int count;
+        
         System.out.println("Enter ID number of item you want to order:");
         try {
             id = Integer.parseInt(input.readLine());
@@ -457,8 +489,13 @@ public class BakeryUI {
     
     /** Adds the item to the inventory */
     static void addItem() {
-        String name, category;
+        /** The name of the item */
+        String name;
+        /** The category of the item */
+        String category;
+        /** The price of the item */
         double price;
+        
         System.out.println("Enter new Item Name:");
         try {
             name = input.readLine();
@@ -530,7 +567,11 @@ public class BakeryUI {
             return;
         }
         
-        String name, category;
+        /** The name of the item */
+        String name;
+        /** The category of the item */
+        String category;
+        
         try {
             System.out.println("Enter name of item:");
             name = input.readLine();
@@ -542,6 +583,7 @@ public class BakeryUI {
             return;
         }
         
+        /** The price of the item */
         Double price;
         try {
             System.out.println("Enter price:");
@@ -570,7 +612,8 @@ public class BakeryUI {
         String cmd;
         try {
             cmd = input.readLine();
-        } catch (IOException e) {
+        } 
+        catch (IOException e) {
             infoMenu();
             return;
         }
@@ -581,7 +624,8 @@ public class BakeryUI {
             String name;
             try {
                 name = input.readLine();
-            } catch (IOException e) {
+            } 
+            catch (IOException e) {
                 infoMenu();
                 return;
             }
@@ -597,6 +641,7 @@ public class BakeryUI {
                 input.readLine();
             } 
             catch (IOException e) {
+                // Return to menu
             }
             infoMenu();
         }
@@ -607,7 +652,8 @@ public class BakeryUI {
             String name;
             try {
                 name = input.readLine();
-            } catch (IOException e) {
+            } 
+            catch (IOException e) {
                 infoMenu();
                 return;
             }
@@ -623,6 +669,7 @@ public class BakeryUI {
                 input.readLine();
             } 
             catch (IOException e) {
+                // Return to menu
             }
             infoMenu();
         }
@@ -633,7 +680,8 @@ public class BakeryUI {
             String date;
             try {
                 date = input.readLine();
-            } catch (IOException e) {
+            } 
+            catch (IOException e) {
                 infoMenu();
                 return;
             }
@@ -643,6 +691,7 @@ public class BakeryUI {
                 input.readLine();
             } 
             catch (IOException e) {
+                // Return to menu
             }
             infoMenu();
         }
@@ -653,7 +702,8 @@ public class BakeryUI {
             String date;
             try {
                 date = input.readLine();
-            } catch (IOException e) {
+            } 
+            catch (IOException e) {
                 infoMenu();
                 return;
             }
@@ -663,6 +713,7 @@ public class BakeryUI {
                 input.readLine();
             } 
             catch (IOException e) {
+                // Return to menu
             }
             infoMenu();
         }
@@ -673,10 +724,12 @@ public class BakeryUI {
             int itemId;
             try {
                 itemId = Integer.parseInt(input.readLine());
-            } catch (NumberFormatException e) {
+            } 
+            catch (NumberFormatException e) {
                 infoMenu();
                 return;
-            } catch (IOException e) {
+            } 
+            catch (IOException e) {
                 infoMenu();
                 return;
             }
@@ -694,6 +747,7 @@ public class BakeryUI {
                 input.readLine();
             } 
             catch (IOException e) {
+                // Return to menu
             }
             infoMenu();
         }
@@ -707,6 +761,4 @@ public class BakeryUI {
             infoMenu();
         }
     }
-    
-    
 }

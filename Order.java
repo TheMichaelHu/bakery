@@ -15,9 +15,11 @@ class Order {
     boolean paid;
     /** the date the order was placed */
     String orderDate;
+    /** The date the order was picked up */
     String pickupDate;
     /** the items in the order */
     HashMap<Item, Integer> items;
+    /** The amount of discount used on the order */
     double discountUsed;
 
     /**
@@ -73,6 +75,11 @@ class Order {
         this.discountUsed = d;
     }
 
+    /**
+     * Adds the given item and its quantity to items
+     * @param i The item
+     * @param num The quantity of the item
+     */
     void addItem(Item i, int num) {
         this.items.put(i, num);
     }
@@ -131,7 +138,8 @@ class Order {
      */
     void printReceipt() {
         String str = "";
-        str += "=========================== Receipt: ===========================";
+        str += "=========================== Receipt: "
+                + "===========================";
         str += "\nORDER ID: " + (this.id + "       ").substring(0, 8)
                 + "  DATE: "
                 + (this.orderDate + "           ").substring(0, 12)
@@ -144,9 +152,11 @@ class Order {
                     + "  AMOUNT: $" + (quantity + "    ").substring(0, 5)
                     + "  PRICE: $" + i.price * quantity;
         }
-        str += "\n-----------------------------------------------------------------";
+        str += "\n-------------------------------------"
+                + "----------------------------";
         str += "\nDISCOUNT USED: " + this.discountUsed;
-        str += "\n-----------------------------------------------------------------";
+        str += "\n-----------------------------"
+                + "------------------------------------";
         str += "\nTOTAL: $" + this.finalPrice();
         str += "\nPAID? " + (this.paid ? "Yes" : "No");
         str += "\nLOYALTY CREDIT: " + this.customer.loyalPoints;
