@@ -27,6 +27,10 @@ public class Database {
     /** the file to save the inventory to when the program exits */
     private File inventoryFile;
 
+    /**
+     * Constructs an empty database that writes to default files ord.txt and
+     * inv.txt
+     */
     Database() {
         this.orders = new HashMap<Integer, Order>();
         this.customers = new HashMap<String, Customer>();
@@ -35,12 +39,33 @@ public class Database {
         this.inventoryFile = new File("inv.txt");
     }
 
+    /**
+     * Constructs an empty database that writes to the specified files
+     * 
+     * @param ordFileName
+     *            the name of the file orders will be written to
+     * @param invFileName
+     *            the name of the file the inventory will be written to
+     */
     Database(String ordFileName, String invFileName) {
         this();
         this.orderFile = new File(ordFileName + ".txt");
         this.inventoryFile = new File(invFileName + ".txt");
     }
 
+    /**
+     * Constructs a populated database using ordFile and invFile and writes to
+     * newOrdFile and newInvFile
+     * 
+     * @param ordFile
+     *            the name of the file orders will be read from
+     * @param invFile
+     *            the name of the file the inventory will be read from
+     * @param newOrdFile
+     *            the name of the file orders will be written to
+     * @param newInvFile
+     *            the name of the file the inventory will be written to
+     */
     Database(String ordFile, String invFile, String newOrdFile,
             String newInvFile) {
         this(newOrdFile, newInvFile);
@@ -48,6 +73,14 @@ public class Database {
         this.populateOrders(this.parseFile(ordFile));
     }
 
+    /**
+     * Parses the contents of a file into an array list of string arrays
+     * 
+     * @param file
+     *            the name of the file to be parsed
+     * @return a string array array list representation of the data in the given
+     *         file
+     */
     private ArrayList<String[]> parseFile(String file) {
         ArrayList<String[]> list = new ArrayList<String[]>();
         try {
@@ -59,11 +92,17 @@ public class Database {
         }
         catch (FileNotFoundException e) {
             System.err.println(file + " does not exist");
-            throw new RuntimeException();
+            e.printStackTrace();
         }
         return list;
     }
 
+    /**
+     * populates the orders database with the given data
+     * 
+     * @param list
+     *            order information
+     */
     private void populateOrders(ArrayList<String[]> list) {
         if (!list.isEmpty() && list.get(0).length == 20
                 && list.get(0)[0].equals("CustomerID")
@@ -135,6 +174,12 @@ public class Database {
         }
     }
 
+    /**
+     * populates the inventory with the given data
+     * 
+     * @param list
+     *            inventory information
+     */
     private void populateInventory(ArrayList<String[]> list) {
         if (!list.isEmpty() && list.get(0).length == 4
                 && list.get(0)[0].equals("BakeryItemID")
@@ -158,6 +203,15 @@ public class Database {
         }
     }
 
+    /**
+     * uses the given information to construct a new order for the orders
+     * database
+     * 
+     * @param cust
+     *            the customer who placed the order
+     * @param list
+     *            order information
+     */
     void addOrder(String cust, HashMap<Integer, Integer> list) {
         if (this.customers.get(cust) == null) {
             System.err.println("Please add the new customer to "
@@ -190,6 +244,16 @@ public class Database {
         o.printReceipt();
     }
 
+    /**
+     * changes the order information of the order with the given id
+     * 
+     * @param id
+     *            the id of the order to be changed
+     * @param cust
+     *            the new customer placing the order
+     * @param list
+     *            a new list of items in the order
+     */
     void updateOrder(int id, String cust, HashMap<Integer, Integer> list) {
         if (this.customers.get(cust) == null) {
             System.err.println("Please add the new customer to "
@@ -209,8 +273,21 @@ public class Database {
         o.items = map;
     }
 
+    /**
+     * updates the customer's info in the customer database after they pick up
+     * their order
+     * 
+     * @param id
+     *            the order id
+     * @param discount
+     *            the discount used on the order (a negative number)
+     */
     void pickupOrder(int id, int discount) {
         Order o = this.orders.get(id);
+        if (discount > 0 || -o.customer.discountPoints > discount) {
+            System.err.println("Cannot process pickup due to invalid discount");
+            return;
+        }
         o.paid = true;
         o.pickupDate = Calendar.MONTH + "/" + Calendar.DATE + "/"
                 + Calendar.YEAR;
@@ -218,23 +295,74 @@ public class Database {
         o.customer.update(o);
     }
 
+    /**
+     * removes the order with the given id of the order database
+     * 
+     * @param id
+     *            the order id
+     */
     void removeOrder(int id) {
         Order o = this.orders.get(id);
-        o.customer.undoUpdate(o);
+        if (o.paid) {
+            o.customer.undoUpdate(o);
+        }
         this.orders.remove(id);
     }
 
+    /**
+     * returns true if the given id points to an order
+     * 
+     * @param id
+     *            the order id
+     * @return returns true if the given id points to an order
+     */
     boolean hasOrder(int id) {
         return this.orders.containsKey(id);
     }
 
+    /**
+     * constructs a customer using the given information and adds it to the
+     * customer database (prerequisite to adding an order from a new customer)
+     * Requires that the name doesn't already exist in the customer database
+     * 
+     * @param name
+     *            the customer's name
+     * @param adr
+     *            the customer's address
+     * @param city
+     *            the customers city
+     * @param state
+     *            the customer's state
+     * @param zip
+     *            the customers's zipcode
+     */
     void addCustomer(String name, String adr, String city, String state,
             String zip) {
+        if (this.hasCustomer(name)) {
+            System.err.println(name + " already exists in the database.");
+            return;
+        }
         Customer c = new Customer(this.customers.size(), name, adr, city,
                 state, zip);
         this.customers.put(c.name, c);
     }
 
+    /**
+     * changes a customer's information
+     * 
+     * @param oldName
+     *            the name of the customer to be changed
+     * @param newName
+     *            the new name of the customer
+     * @param adr
+     *            the new address of the customer
+     * @param city
+     *            the new city of the customer
+     * @param state
+     *            the new state of the customer
+     * @param zip
+     *            the new zipcode of the customer
+     */
     void updateCustomer(String oldName, String newName, String adr,
             String city, String state, String zip) {
         Customer c = this.customers.get(oldName);
@@ -245,10 +373,27 @@ public class Database {
         c.zipcode = zip;
     }
 
+    /**
+     * returns true a customer of the given name is present within the customer
+     * database
+     * 
+     * @param name
+     *            a name
+     * @return returns true if a customer in the customer database has the given
+     *         name
+     */
     boolean hasCustomer(String name) {
         return this.customers.containsKey(name);
     }
 
+    /**
+     * returns true a customer of the given id is present within the customer
+     * database
+     * 
+     * @param id
+     *            a customer id
+     * @return returns true if the given id points to a customer
+     */
     boolean hasCustomer(int id) {
         for (Customer c : this.customers.values()) {
             if (c.id == id) {
@@ -258,14 +403,40 @@ public class Database {
         return true;
     }
 
+    /**
+     * returns the customer with the given name from the customer database
+     * 
+     * @param name
+     *            a customer's name
+     * @return returns the customer with the given name from the customer
+     *         database
+     */
     Customer getCustomer(String name) {
         return this.customers.get(name);
     }
 
+    /**
+     * prints out the information of the customer with the given name
+     * 
+     * @param name
+     *            a customer's name
+     */
     void printCustomer(String name) {
         this.customers.get(name).printCustomer();
     }
 
+    /**
+     * constucts an item with the given information and adds it to the inventory
+     * 
+     * @param name
+     *            the item's name
+     * @param category
+     *            the item's category
+     * @param price
+     *            the item's price
+     * @return returns the customer with the given name from the customer
+     *         database
+     */
     void addItem(String name, String category, double price) {
         // Calculate next id
         int id = 0;
@@ -278,14 +449,40 @@ public class Database {
         this.inventory.put(i.id, i);
     }
 
+    /**
+     * sets the item with the given id to the Discontinued category
+     * 
+     * @param id
+     *            the id of an item
+     */
     void removeItem(int id) {
         this.inventory.get(id).category = "Discontinued";
     }
 
+    /**
+     * returns the item with the given id from the inventory
+     * 
+     * @param id
+     *            the id of an item
+     * @return the item with the given id from the inventory
+     */
     HashMap<Item, Integer> getItems(int id) {
         return this.orders.get(id).items;
     }
-    
+
+    /**
+     * changes the info of an item in the inventory
+     * 
+     * @param id
+     *            the id of an item
+     * @param name
+     *            the new name of item
+     * @param category
+     *            the item's new category
+     * @param price
+     *            the item's new price
+     * @return the item with the given id from the inventory
+     */
     void updateItem(int id, String name, String category, double price) {
         Item i = this.inventory.get(id);
         i.name = name;
@@ -293,14 +490,30 @@ public class Database {
         i.price = price;
     }
 
+    /**
+     * returns true if an item with the given id exists within the inventory
+     * 
+     * @param id
+     *            the id of an item
+     * @return true if an item with the given id exists within the inventory
+     */
     boolean hasItem(int id) {
         return this.inventory.containsKey(id);
     }
 
+    /**
+     * returns the total number of purchases made to this bakery
+     * 
+     * @return the total number of purchases made to this bakery
+     */
     int totalPurchases() {
         return this.orders.size();
     }
 
+    /**
+     * writes the information contained in orders and inventory to the files
+     * specified in the constructor
+     */
     void writeToFiles() {
         try {
             BufferedWriter writer;
@@ -484,6 +697,9 @@ public class Database {
         System.out.println();
     }
 
+    /**
+     * Prints all unpaid orders
+     */
     void printUnpaidOrders() {
         String data = "CustomerID\tName\t"
                 + "OrderID\tPaid?\tOrderDate\tPickupDate\t"
@@ -507,6 +723,9 @@ public class Database {
         System.out.println();
     }
 
+    /**
+     * Prints all items in the inventory
+     */
     void printInventory() {
         String data = "BakeryItemID\tBakeryItemName\tCategory\tPrice";
         for (Item i : this.inventory.values()) {

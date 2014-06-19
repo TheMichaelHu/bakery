@@ -6,11 +6,12 @@ import java.util.HashMap;
  * @author Michael Hu and William Enright
  * @version 6/15/2014
  */
-public class Order {
+class Order {
     /** the customer placing the order */
     Customer customer;
     /** the id of the order */
     int id;
+    /** true if the order has been paid for */
     boolean paid;
     /** the date the order was placed */
     String orderDate;
@@ -111,15 +112,18 @@ public class Order {
         return this.totalPrice() + this.discountUsed;
     }
 
-    /** =========================== Receipt: ===========================
+    /** 
+     * prints a receipt to the console
+     * example:
+     * =========================== Receipt: ===========================
      * ORDER ID: 118      ORDER DATE: 12/12/12     PICKUP DATE: 12/12/12
-     * NAME: the Wankershim
-     * -- ITEM: Triple Berry Shortcake   AMOUNT: 12     PRICE: $12.67
+     * NAME: Wankershim
+     * -- ITEM: Food                     AMOUNT: 12     PRICE: $12.67
      * -- ITEM                           AMOUNT         PRICE
      * -----------------------------------------------------------------
      * DISCOUNT USED: 0
      * -----------------------------------------------------------------
-     * TOTAL: $12222
+     * TOTAL: $12.67
      * PAID? Yes
      * LOYALTY CREDIT: 13333
      * DISCOUNT AVAILABLE: 100

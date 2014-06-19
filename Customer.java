@@ -4,15 +4,18 @@
  * @author Michael Hu and William Enright
  * @version 6/15/2014
  */
-public class Customer {
+class Customer {
     /** The id of the customer */
     int id;
     /** The name of the customer */
     String name;
     /** The customer's address */
     String address;
+    /** The customer's city */
     String city;
+    /** The customer's state */
     String state;
+    /** The customer's zipcode */
     String zipcode;
     /** loyalty points, 100 will get the customer 10 discount points */
     double loyalPoints;
@@ -25,24 +28,18 @@ public class Customer {
      * 
      * @param i
      *            the id of the customer
-     * 
      * @param n
      *            the name of the customer
-     * 
      * @param a
      *            the customer's address
-     * 
      * @param c
      *            the customer's city
      * @param s
      *            the customer's state
-     * 
      * @param z
      *            the customer's zipcode
-     * 
      * @param lp
      *            true customer's loyalty points
-     * 
      * @param dp
      *            true customer's discount points
      */
@@ -89,6 +86,9 @@ public class Customer {
         }
     }
 
+    /**
+     * prints out all the credentials of this customer to the console
+     */
     void printCustomer() {
         System.out.println("NAME: " + this.name + "\nADDRESS: " + this.address
                 + ", " + this.city + ", " + this.state + " " + this.zipcode

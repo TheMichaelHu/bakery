@@ -4,7 +4,7 @@
  * @author Michael Hu and William Enright
  * @version 6/15/2014
  */
-public class Item {
+class Item {
     /** the id of the item */
     int id;
     /** the name of the item */
@@ -20,13 +20,10 @@ public class Item {
      * 
      * @param i
      *            the id of the item
-     * 
      * @param n
      *            the name of the item
-     * 
      * @param c
      *            the category of the item
-     * 
      * @param p
      *            the item's price
      */
