@@ -1,6 +1,8 @@
 
 import java.util.HashMap;
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 /**
  * Class to represent the User Interface of the Bakery System
@@ -11,14 +13,14 @@ public class BakeryUI {
     
     static boolean quit = false;
     static Database data;
-    static Scanner input;
+    static BufferedReader input;
     
     /**
      * The main method to start the database  UI
      * @param args Console arguments
      */
     public static void main(String[] args) {
-        input = new Scanner(System.in);
+        input = new BufferedReader(new InputStreamReader(System.in));
         
         startUp();
         while (!quit) {
@@ -35,8 +37,14 @@ public class BakeryUI {
                 "Enter a command to use the corresponding function:");
         System.out.println("e - Initialize empty database");
         System.out.println("f - Initialize database from files");
-        String cmd = input.next();
-        input.nextLine(); //Skips over extra input
+        String cmd;
+        try {
+            cmd = input.readLine();
+        } 
+        catch (IOException e2) {
+            startUp();
+            return;
+        }
         // Creates empty database
         if (cmd.equals("e")) {
             data = new Database();
@@ -46,12 +54,25 @@ public class BakeryUI {
         else if (cmd.equals("f")) {
             System.out.println();
             System.out.println("Enter the name of the file for order data:");
-            String orders = readString();
+            String orders;
+            try {
+                orders = input.readLine();
+            } 
+            catch (IOException e1) {
+                startUp();
+                return;
+            }
             
             System.out.println();
             System.out.println(
                     "Enter the name of the file for inventory data:");
-            String inventory = readString();
+            String inventory;
+            try {
+                inventory = input.readLine();
+            } catch (IOException e1) {
+                startUp();
+                return;                
+            }
             
             try {
                 data = new Database(orders, inventory);
@@ -83,8 +104,12 @@ public class BakeryUI {
         System.out.println("s  - Output Database to File");
         System.out.println("q  - Quit the System");
         
-        String cmd = input.next();
-        input.nextLine(); //Skips over extra input
+        String cmd;
+        try {
+            cmd = input.readLine();
+        } catch (IOException e) {
+            return;
+        }
         // View Item Menu
         if (cmd.equals("m")) {
             System.out.println();
@@ -147,9 +172,12 @@ public class BakeryUI {
         System.out.println("All Items Available for Order:");
         data.printInventory();
         System.out.println();
-        System.out.println("Enter any Key to Continue...");
-        input.next();
-        input.nextLine(); //Skips over extra input
+        System.out.println("Press Enter to Continue...");
+        try {
+            input.readLine();
+        } 
+        catch (IOException e) {
+        }
     }
     
     /** Prompts for each field of a new customer and adds it to data 
@@ -159,7 +187,7 @@ public class BakeryUI {
         String name, address, city, state, zipcode;
         System.out.println("Enter new Customer Name (Full name):");
         try {
-            name = readString();
+            name = input.readLine();
             if (data.hasCustomer(name)) {
                 System.out.println("--- Name Already In Database ---");
                 return addCustomer();
@@ -172,7 +200,7 @@ public class BakeryUI {
         }
         System.out.println("Enter new Customer Address:");
         try {
-            address = readString();
+            address = input.readLine();
         }
         catch (Exception e) {
             System.out.println("--- Invalid Input ---");
@@ -181,7 +209,7 @@ public class BakeryUI {
         }
         System.out.println("Enter new Customer City:");
         try {
-            city = readString();
+            city = input.readLine();
         }
         catch (Exception e) {
             System.out.println("--- Invalid Input ---");
@@ -190,7 +218,7 @@ public class BakeryUI {
         }
         System.out.println("Enter new Customer State:");
         try {
-            state = readString();
+            state = input.readLine();
         }
         catch (Exception e) {
             System.out.println("--- Invalid Input ---");
@@ -199,8 +227,7 @@ public class BakeryUI {
         }
         System.out.println("Enter new Customer Zipcode:");
         try {
-            zipcode = input.next();
-            input.nextLine(); //Skips over extra input
+            zipcode = input.readLine();
         }
         catch (Exception e) {
             System.out.println("--- Invalid Input ---");
@@ -216,7 +243,12 @@ public class BakeryUI {
     /** Prompts for a customer and replaces it with an updated one */
     static void updateCustomer() {
         System.out.println("Enter name of customer to update:");
-        String oldName = readString();
+        String oldName;
+        try {
+            oldName = input.readLine();
+        } catch (IOException e1) {
+            return;
+        }
         if (!data.hasCustomer(oldName)) {
             System.out.println("--- Customer not in database. ---");
             return;
@@ -225,7 +257,7 @@ public class BakeryUI {
         String name, address, city, state, zipcode;
         System.out.println("Enter new Customer Name (Full name):");
         try {
-            name = readString();
+            name = input.readLine();
         }
         catch (Exception e) {
             System.out.println("--- Invalid Input ---");
@@ -235,7 +267,7 @@ public class BakeryUI {
         }
         System.out.println("Enter new Customer Address:");
         try {
-            address = readString();
+            address = input.readLine();
         }
         catch (Exception e) {
             System.out.println("--- Invalid Input ---");
@@ -245,7 +277,7 @@ public class BakeryUI {
         }
         System.out.println("Enter new Customer City:");
         try {
-            city = readString();
+            city = input.readLine();
         }
         catch (Exception e) {
             System.out.println("--- Invalid Input ---");
@@ -255,7 +287,7 @@ public class BakeryUI {
         }
         System.out.println("Enter new Customer State:");
         try {
-            state = readString();
+            state = input.readLine();
         }
         catch (Exception e) {
             System.out.println("--- Invalid Input ---");
@@ -265,8 +297,7 @@ public class BakeryUI {
         }
         System.out.println("Enter new Customer Zipcode:");
         try {
-            zipcode = input.next();
-            input.nextLine(); //Skips over extra input
+            zipcode = input.readLine();
         }
         catch (Exception e) {
             System.out.println("--- Invalid Input ---");
@@ -282,14 +313,18 @@ public class BakeryUI {
     /** Adds a new order to the database */
     static void addOrder() {
         System.out.println("Is this order for an existing customer? (y/n)");
-        String cmd = input.next();
-        input.nextLine(); // Skips extra input
+        String cmd;
+        try {
+            cmd = input.readLine();
+        } catch (IOException e1) {
+            return;
+        }
         
         String name;
         if (cmd.equals("y")) {
             System.out.println("Enter Full Customer Name:");
             try {
-                name = readString();
+                name = input.readLine();
                 data.getCustomer(name);
             }
             catch (Exception e) {
@@ -327,7 +362,7 @@ public class BakeryUI {
     static void removeOrder() {
         System.out.println("Enter ID number of order to remove:");
         try {
-            int id = input.nextInt();
+            int id = Integer.parseInt(input.readLine());
             if (data.hasOrder(id)) {
                 data.removeOrder(id);
                 System.out.println("Order " + id + 
@@ -346,9 +381,9 @@ public class BakeryUI {
     
     /** Replaces the order with the given ID with a new one */
     static void updateOrder() {
-        System.out.println("Enter ID number of order to change:");
+        /*System.out.println("Enter ID number of order to change:");
         try {
-            int oldId = input.nextInt();
+            int oldId = Integer.parseInt(input.readLine());
             if (data.hasOrder(oldId)) {
                 data.removeOrder(oldId);
                 addOrder(oldId);
@@ -361,7 +396,7 @@ public class BakeryUI {
         catch (Exception e) {
             System.out.println("--- Invalid Input ---");
             return;
-        }
+        }*/
     }
     
     /** Adds the item to the inventory */
@@ -370,7 +405,7 @@ public class BakeryUI {
         double price;
         System.out.println("Enter new Item Name:");
         try {
-            name = readString();
+            name = input.readLine();
         }
         catch (Exception e) {
             System.out.println("--- Invalid Input ---");
@@ -380,7 +415,7 @@ public class BakeryUI {
         }
         System.out.println("Enter new Item Category:");
         try {
-            category = input.next();
+            category = input.readLine();
         }
         catch (Exception e) {
             System.out.println("--- Invalid Input ---");
@@ -390,7 +425,7 @@ public class BakeryUI {
         }
         System.out.println("Enter new Item Price (double):");
         try {
-            price = input.nextDouble();
+            price = Double.parseDouble(input.readLine());
         }
         catch (Exception e) {
             System.out.println("--- Invalid Input ---");
@@ -406,8 +441,7 @@ public class BakeryUI {
     static void removeItem() {
         System.out.println("Enter ID of item to remove from inventory:");
         try {
-            int id = input.nextInt();
-            input.nextLine(); // Skips over extra input
+            int id = Integer.parseInt(input.readLine());
             if (data.hasItem(id)) {
                 data.removeItem(id);
                 System.out.println("Item " + id + 
@@ -426,9 +460,9 @@ public class BakeryUI {
     
     /** Replaces the given item with a new one */
     static void updateItem() {
-        System.out.println("Enter name of item to update:");
+        /*System.out.println("Enter name of item to update:");
         try {
-            String name = input.next();
+            String name = input.readLine();
             if (data.inventory.containsKey(name)) {
                 int newId = data.orders.remove(name).id;
                 addItem(newId);
@@ -441,7 +475,7 @@ public class BakeryUI {
         catch (Exception e) {
             System.out.println("--- Invalid Input ---");
             return;
-        }
+        }*/
     }
     
     
@@ -456,38 +490,123 @@ public class BakeryUI {
         System.out.println("ou - All unpaid orders");
         System.out.println("x  - Return to Main Menu");
         
-        String cmd = input.next();
-        input.nextLine(); // Skips over extra input
+        String cmd;
+        try {
+            cmd = input.readLine();
+        } catch (IOException e) {
+            infoMenu();
+            return;
+        }
+        // Specific customer information
         if (cmd.equals("c")) {
             System.out.println();
-            customerInfo();
+            //TODO: customerInfo();
+            System.out.println("Press Enter to Continue...");
+            try {
+                input.readLine();
+            } 
+            catch (IOException e) {
+            }
             infoMenu();
         }
+        // Orders for a certain customer
         else if (cmd.equals("oc")) {
             System.out.println();
-            customerOrders();
+            System.out.println("Enter the full name of the customer:");
+            String name;
+            try {
+                name = input.readLine();
+            } catch (IOException e) {
+                infoMenu();
+                return;
+            }
+            if (data.hasCustomer(name)) {
+                data.printCustomerOrders(name);
+            }
+            else {
+                System.out.println("--- Customer name not in database ---");
+                infoMenu();
+            }
+            System.out.println("Press Enter to Continue...");
+            try {
+                input.readLine();
+            } 
+            catch (IOException e) {
+            }
             infoMenu();
         }
+        // Orders placed on a certain date
         else if (cmd.equals("op")) {
             System.out.println();
-            placedDateOrders();
+            System.out.println("Enter the Date to search for (MM/DD/YYYY):");
+            String date;
+            try {
+                date = input.readLine();
+            } catch (IOException e) {
+                infoMenu();
+                return;
+            }
+            data.printPlacedDateOrders(date);
+            System.out.println("Press Enter to Continue...");
+            try {
+                input.readLine();
+            } 
+            catch (IOException e) {
+            }
             infoMenu();
         }
+        // Orders completed/picked up on a certain date
         else if (cmd.equals("of")) {
             System.out.println();
-            finishedDateOrders();
+            System.out.println("Enter the Date to search for (MM/DD/YYYY):");
+            String date;
+            try {
+                date = input.readLine();
+            } catch (IOException e) {
+                infoMenu();
+                return;
+            }
+            data.printFinishedDateOrders(date);
+            System.out.println("Press Enter to Continue...");
+            try {
+                input.readLine();
+            } 
+            catch (IOException e) {
+            }
             infoMenu();
         }
+        // Orders of a particular item
         else if (cmd.equals("oi")) {
             System.out.println();
-            itemOrders();
+            System.out.println("Enter the Item ID to search for:");
+            int itemId;
+            try {
+                itemId = Integer.parseInt(input.readLine());
+            } catch (NumberFormatException e) {
+                infoMenu();
+                return;
+            } catch (IOException e) {
+                infoMenu();
+                return;
+            }
+            System.out.println("Orders of Item " + itemId + ":");
+            data.printItemOrders(itemId);
             infoMenu();
         }
+        // Unpaid Orders
         else if (cmd.equals("ou")) {
             System.out.println();
+            System.out.println("Unpaid Orders:");
             data.printUnpaidOrders();
+            System.out.println("Press Enter to Continue...");
+            try {
+                input.readLine();
+            } 
+            catch (IOException e) {
+            }
             infoMenu();
         }
+        // Exit to main menu
         else if (cmd.equals("x")) {
             System.out.println();
         }
@@ -499,17 +618,4 @@ public class BakeryUI {
     }
     
     
-    
-    /** Method used to get an entire string from the console
-     *  regardless of spaces
-     * @return The string from the console
-     */
-    static String readString() {
-        String ret;
-        ret = input.next();
-        while (input.hasNext()) {
-            ret = ret + " " + input.next();
-        }
-        return ret;
-    }
 }

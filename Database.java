@@ -306,6 +306,7 @@ public class Database {
         }
     }
 
+    /** Prints all orders */
     void printOrders() {
         String data = "CustomerID\tLastName\tAddress\tCity\tState\t"
                 + "ZipCode\tOrderID\tPaid?\tOrderDate\tPickupDate\t"
@@ -327,6 +328,137 @@ public class Database {
             }
         }
         System.out.println(data);
+    }
+    
+    /**
+     * Prints all the orders placed by the given customer
+     * @param customer The given customer's name
+     */
+    void printCustomerOrders(String customer) {
+        String data = "CustomerID\tName\t"
+                + "OrderID\tPaid?\tOrderDate\tPickupDate\t"
+                + "BakeryItemID\tBakeryItemName\tBakeryItemCategory\t"
+                + "Quantity\tPrice\tTotal\tDiscountUsedOnOrder\tTotalDue";
+        for (Order o : this.orders.values()) {
+            Customer c = o.customer;
+            if (c.name.equals(customer)) {
+                for (Item i : o.items.keySet()) {
+                    int quantity = o.items.get(i);
+                    data += "\n" + c.id + "\t" + c.name + "\t"
+                            + o.id + "\t" + o.paid + "\t" + o.orderDate + "\t"
+                            + o.pickupDate + "\t" + i.id + "\t" + i.name + "\t"
+                            + i.category + "\t" + quantity + "\t" 
+                            + i.price + "\t" + o.totalPrice() + "\t" 
+                            + o.discountUsed + "\t" + o.finalPrice();
+                }
+            }
+        }
+        System.out.println(data);
+        System.out.println();
+    }
+    
+    /**
+     * Prints all orders placed on a certain date
+     * @param date The given date
+     */
+    void printPlacedDateOrders(String date) {
+        String data = "CustomerID\tName\t"
+                + "OrderID\tPaid?\tOrderDate\tPickupDate\t"
+                + "BakeryItemID\tBakeryItemName\tBakeryItemCategory\t"
+                + "Quantity\tPrice\tTotal\tDiscountUsedOnOrder\tTotalDue";
+        for (Order o : this.orders.values()) {
+            Customer c = o.customer;
+            if (o.orderDate.equals(date)) {
+                for (Item i : o.items.keySet()) {
+                    int quantity = o.items.get(i);
+                    data += "\n" + c.id + "\t" + c.name + "\t"
+                            + o.id + "\t" + o.paid + "\t" + o.orderDate + "\t"
+                            + o.pickupDate + "\t" + i.id + "\t" + i.name + "\t"
+                            + i.category + "\t" + quantity + "\t" 
+                            + i.price + "\t" + o.totalPrice() + "\t" 
+                            + o.discountUsed + "\t" + o.finalPrice();
+                }
+            }
+        }
+        System.out.println(data);
+        System.out.println();
+    }
+    
+    /**
+     * Prints all orders finished/picked up on a certain date
+     * @param date The given date
+     */
+    void printFinishedDateOrders(String date) {
+        String data = "CustomerID\tName\t"
+                + "OrderID\tPaid?\tOrderDate\tPickupDate\t"
+                + "BakeryItemID\tBakeryItemName\tBakeryItemCategory\t"
+                + "Quantity\tPrice\tTotal\tDiscountUsedOnOrder\tTotalDue";
+        for (Order o : this.orders.values()) {
+            Customer c = o.customer;
+            if (o.pickupDate.equals(date)) {
+                for (Item i : o.items.keySet()) {
+                    int quantity = o.items.get(i);
+                    data += "\n" + c.id + "\t" + c.name + "\t"
+                            + o.id + "\t" + o.paid + "\t" + o.orderDate + "\t"
+                            + o.pickupDate + "\t" + i.id + "\t" + i.name + "\t"
+                            + i.category + "\t" + quantity + "\t" 
+                            + i.price + "\t" + o.totalPrice() + "\t" 
+                            + o.discountUsed + "\t" + o.finalPrice();
+                }
+            }
+        }
+        System.out.println(data);
+        System.out.println();
+    }
+    
+    /**
+     * Prints all orders of the given item id
+     * @param itemId The id of the item
+     */
+    void printItemOrders(int itemId) {
+        String data = "CustomerID\tName\t"
+                + "OrderID\tPaid?\tOrderDate\tPickupDate\t"
+                + "BakeryItemID\tBakeryItemName\tBakeryItemCategory\t"
+                + "Quantity\tPrice\tTotal\tDiscountUsedOnOrder\tTotalDue";
+        for (Order o : this.orders.values()) {
+            Customer c = o.customer;
+            for (Item i : o.items.keySet()) {
+                if (i.id == itemId) {
+                    int quantity = o.items.get(i);
+                    data += "\n" + c.id + "\t" + c.name + "\t"
+                            + o.id + "\t" + o.paid + "\t" + o.orderDate + "\t"
+                            + o.pickupDate + "\t" + i.id + "\t" + i.name + "\t"
+                            + i.category + "\t" + quantity + "\t" 
+                            + i.price + "\t" + o.totalPrice() + "\t" 
+                            + o.discountUsed + "\t" + o.finalPrice();
+                }
+            }
+        }
+        System.out.println(data);
+        System.out.println();
+    }
+    
+    void printUnpaidOrders() {
+        String data = "CustomerID\tName\t"
+                + "OrderID\tPaid?\tOrderDate\tPickupDate\t"
+                + "BakeryItemID\tBakeryItemName\tBakeryItemCategory\t"
+                + "Quantity\tPrice\tTotal\tDiscountUsedOnOrder\tTotalDue";
+        for (Order o : this.orders.values()) {
+            Customer c = o.customer;
+            if (!o.paid) {
+                for (Item i : o.items.keySet()) {
+                    int quantity = o.items.get(i);
+                    data += "\n" + c.id + "\t" + c.name + "\t"
+                            + o.id + "\t" + o.paid + "\t" + o.orderDate + "\t"
+                            + o.pickupDate + "\t" + i.id + "\t" + i.name + "\t"
+                            + i.category + "\t" + quantity + "\t" 
+                            + i.price + "\t" + o.totalPrice() + "\t" 
+                            + o.discountUsed + "\t" + o.finalPrice();
+                }
+            }
+        }
+        System.out.println(data);
+        System.out.println();
     }
 
     void printInventory() {
